@@ -29,13 +29,6 @@ private struct MessageRow: View {
                         .font(.headline)
                         .lineLimit(1)
 
-                    if message.isFlagged {
-                        Image(systemName: "flag.fill")
-                            .imageScale(.small)
-                            .foregroundStyle(.orange)
-                            .padding(.leading, 2)
-                    }
-
                     Spacer()
 
                     // date + custom chevron
@@ -51,10 +44,19 @@ private struct MessageRow: View {
                     }
                 }
 
-                Text(message.preview)
-                    .font(.footnote)
-                    .foregroundStyle(.textSecondary)
-                    .lineLimit(2)
+                HStack(alignment: .top) {
+                    Text(message.preview)
+                        .font(.footnote)
+                        .foregroundStyle(.textSecondary)
+                        .lineLimit(2)
+                    
+                    if message.isFlagged {
+                        Image(systemName: "flag.fill")
+                            .imageScale(.small)
+                            .foregroundStyle(.orange)
+                            .padding(.leading, 2)
+                    }
+                }
             }
         }
         .padding(.vertical, 4)
