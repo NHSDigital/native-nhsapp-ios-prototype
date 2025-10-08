@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		D75D79922E96ACE200166E5B /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = D75D79912E96ACE200166E5B /* .gitignore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		D72C45552E951BCC00840B3C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +31,7 @@
 		D72C45472E951BCC00840B3C /* nhsapp-ios-demo-v2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "nhsapp-ios-demo-v2.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D72C45542E951BCC00840B3C /* nhsapp-ios-demo-v2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "nhsapp-ios-demo-v2Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D72C455E2E951BCC00840B3C /* nhsapp-ios-demo-v2UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "nhsapp-ios-demo-v2UITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D75D79912E96ACE200166E5B /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +80,7 @@
 		D72C453E2E951BCC00840B3C = {
 			isa = PBXGroup;
 			children = (
+				D75D79912E96ACE200166E5B /* .gitignore */,
 				D72C45492E951BCC00840B3C /* nhsapp-ios-demo-v2 */,
 				D72C45572E951BCC00840B3C /* nhsapp-ios-demo-v2Tests */,
 				D72C45612E951BCC00840B3C /* nhsapp-ios-demo-v2UITests */,
@@ -212,6 +218,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D75D79922E96ACE200166E5B /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
