@@ -235,7 +235,7 @@ struct HomeView: View {
                             Text("Option 3").tag("Option 3")
                         }
                         .pickerStyle(.menu)
-                        .frame(width: 120)
+                        .frame(width: 160)
                     }
 
                     HStack {
