@@ -9,9 +9,9 @@ struct SplashView: View {
 
     var body: some View {
         ZStack {
-            Color("BrandBackground").ignoresSafeArea()
+            Color.accentColor.ignoresSafeArea()
 
-            Image("AppLogo") // same asset as Launch Screen
+            Image("nhs_logo") // same asset as Launch Screen
                 .resizable()
                 .scaledToFit()
                 .frame(width: 120, height: 120)
@@ -20,22 +20,33 @@ struct SplashView: View {
         }
         .onAppear {
             if reduceMotion {
-                // Respect Reduce Motion: no bouncy animation
                 opacity = 1
                 scale = 1
-                // Keep the timing short so it doesn’t feel like a delay
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
                     onFinish()
                 }
             } else {
-                withAnimation(.easeOut(duration: 0.45)) { opacity = 1 }
-                withAnimation(.spring(response: 0.7, dampingFraction: 0.6, blendDuration: 0)) {
-                    scale = 1.0
+                // 👇 Delay the logo animation slightly (e.g. 0.4 seconds)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    withAnimation(.easeOut(duration: 1)) {
+                        opacity = 1
+                    }
+                    withAnimation(.spring(response: 0.7, dampingFraction: 0.6, blendDuration: 0)) {
+                        scale = 1.0
+                    }
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
+
+                // Keep total splash time about 2 seconds
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                     onFinish()
                 }
             }
         }
+    }
+}
+
+#Preview {
+    SplashView {
+        // no-op for preview
     }
 }

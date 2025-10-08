@@ -12,7 +12,7 @@ struct NHSButton: View {
     let title: String
     let style: Style
     let action: () -> Void
-    var cornerRadius: CGFloat = 16
+    var cornerRadius: CGFloat = 20
 
     var body: some View {
         Button(action: action) {

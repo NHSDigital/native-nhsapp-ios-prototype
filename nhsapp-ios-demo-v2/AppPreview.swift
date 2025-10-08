@@ -1,16 +1,16 @@
 import SwiftUI
 
-struct AppPreview: View {
+struct AppFlowPreview: View {
     @State private var showSplash = true
 
     var body: some View {
         ZStack {
-            ContentView()
+            MainTabView()
                 .opacity(showSplash ? 0 : 1)
 
             if showSplash {
                 SplashView {
-                    withAnimation(.easeOut(duration: 0.35)) {
+                    withAnimation(.easeOut(duration: 0.8)) {
                         showSplash = false
                     }
                 }
@@ -21,10 +21,6 @@ struct AppPreview: View {
 }
 
 #Preview("App Flow – Runs Splash") {
-    AppPreview()
-}
-
-#Preview("App Flow – Post Splash (Dark)") {
-    AppPreview()
-        .preferredColorScheme(.dark)
+    AppFlowPreview()
+        .environmentObject(ExternalLinkManager())
 }
