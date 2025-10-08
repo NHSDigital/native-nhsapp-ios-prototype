@@ -22,5 +22,4 @@ struct AppFlowPreview: View {
 
 #Preview("App Flow – Runs Splash") {
     AppFlowPreview()
-        .environmentObject(ExternalLinkManager())
 }

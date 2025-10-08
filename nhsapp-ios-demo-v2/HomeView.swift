@@ -2,9 +2,6 @@ import SwiftUI
 
 struct HomeView: View {
     
-    // For handling external links
-    @EnvironmentObject private var externalLinks: ExternalLinkManager
-    
     // State variables for toggle examples
     @State private var toggleOne = true
     @State private var toggleTwo = false
@@ -84,12 +81,6 @@ struct HomeView: View {
                     NavigationLink("Link") { DetailView(index: 5) }
                 }
 
-                // External links
-                Section {
-                    ExternalLinkRow(title: "External link 1", url: URL(string: "https://www.nhs.uk")!) { url in externalLinks.open(url) }
-                    ExternalLinkRow(title: "External link 2", url: URL(string: "https://111.nhs.uk/")!) { url in externalLinks.open(url) }
-                }
-
                 // Buttons
                 Section {
                     Button("Button") { }
@@ -107,7 +98,6 @@ struct HomeView: View {
                 Section("All of the above") {
                     Text("Text row")
                     NavigationLink("Link") { DetailView(index: 0) }
-                    ExternalLinkRow(title: "External link", url: URL(string: "https://www.nhs.uk")!) { url in externalLinks.open(url) }
                     Button("Button") { }
                     Button("Button cancel", role: .cancel) { }
                     Button("Button desctructive", role: .destructive) { }
@@ -220,11 +210,9 @@ struct HomeView: View {
             .nhsListStyle()
         }
         .background(Color.PageBackground)
-        .externalLinkPresenter()
     }
 }
 
 #Preview { HomeView()
-        .environmentObject(ExternalLinkManager())
 }
 
