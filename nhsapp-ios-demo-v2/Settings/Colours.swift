@@ -1,16 +1,17 @@
 import SwiftUI
 
+// 1) Semantic color aliases (single allocation, auto-adapts via Asset variants)
 extension Color {
-    static var PageBackground: Color { Color("NHSGrey5") }
-    static var Text: Color { Color("NHSBlack") }
-    static var TextSecondary: Color { Color("NHSGrey1") }
-    static var TextDestructive: Color { Color("NHSRed") }
-    static var NHSWhite: Color { Color("NHSWhite") }
+    static let pageBackground   = Color("NHSGrey5")
+    static let text             = Color("NHSBlack")
+    static let textSecondary    = Color("NHSGrey1")
+    static let textDestructive  = Color("NHSRed")
 }
 
+// 2) Shorthands so you can write `.foregroundStyle(.text)` etc.
 extension ShapeStyle where Self == Color {
-    static var PageBackground: Color { Color.PageBackground }
-    static var Text: Color { Color.Text }
-    static var TextSecondary: Color { Color.TextSecondary }
-    static var TextDestructive: Color { Color.TextDestructive }
+    static var pageBackground: Color  { .pageBackground }
+    static var text: Color            { .text }
+    static var textSecondary: Color   { .textSecondary }
+    static var textDestructive: Color { .textDestructive }
 }

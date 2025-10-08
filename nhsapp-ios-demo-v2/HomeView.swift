@@ -28,7 +28,7 @@ struct HomeView: View {
                     Text("Section header")
                 } footer: {
                     Text("Footer text explaining something.")
-                        .foregroundStyle(.TextSecondary)
+                        .foregroundStyle(.textSecondary)
                 }
 
                 // Custom row with title and subtitle
@@ -40,7 +40,7 @@ struct HomeView: View {
 
                             Text("Subtitle or description text")
                                 .font(.subheadline)
-                                .foregroundStyle(.TextSecondary)
+                                .foregroundStyle(.textSecondary)
                         }
                     }
                     .padding(.vertical, 4)
@@ -83,7 +83,7 @@ struct HomeView: View {
                                 Text("Main title")
                                 Text("Subtitle or description text")
                                     .font(.subheadline)
-                                    .foregroundStyle(.TextSecondary)
+                                    .foregroundStyle(.textSecondary)
                             }
                         }
                         .padding(.vertical, 4)
@@ -100,7 +100,7 @@ struct HomeView: View {
 
                             Text("Subtitle or description text")
                                 .font(.subheadline)
-                                .foregroundStyle(.TextSecondary)
+                                .foregroundStyle(.textSecondary)
                         }
                     }
                     .padding(.vertical, 4)
@@ -259,7 +259,7 @@ struct HomeView: View {
             .navigationTitle("Lists")
             .nhsListStyle()
         }
-        .background(Color.PageBackground)
+        .background(Color.pageBackground)
     }
 }
 
