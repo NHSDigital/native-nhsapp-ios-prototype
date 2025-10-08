@@ -11,6 +11,5 @@ struct NHSToggleStyle: ToggleStyle {
                 .labelsHidden()
                 .tint(Color("NHSGreen"))
         }
-        .padding(.vertical, 4)
     }
 }
