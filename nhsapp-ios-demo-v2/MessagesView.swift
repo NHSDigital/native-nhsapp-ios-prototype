@@ -34,20 +34,17 @@ private struct MessageRow: View {
                     // date + custom chevron
                     HStack(spacing: 4) {
                         Text(messageListDateString(for: message.date))
-                            .font(.caption)
-                            .multilineTextAlignment(.trailing)
+                            .font(.subheadline)
                             .foregroundStyle(.textSecondary)
-                            .padding(.top, 4)
                         Image(systemName: "chevron.right")
-                            .font(.caption2)
+                            .font(.subheadline)
                             .foregroundStyle(.tertiary)
-                            .padding(.top, 4)
                     }
                 }
 
                 HStack(alignment: .top) {
                     Text(message.preview)
-                        .font(.footnote)
+                        .font(.subheadline)
                         .foregroundStyle(.textSecondary)
                         .lineLimit(2)
 
@@ -116,25 +113,69 @@ fileprivate func messageListDateString(for date: Date, calendar: Calendar = .cur
     return DateFormatter.messageFull.string(from: date)
 }
 
+// MARK: - Preferred full date format for detail view
+
+fileprivate extension DateFormatter {
+    static let messageFullLong: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "d MMMM yyyy"      // e.g. "4 October 2023"
+        f.locale = Locale(identifier: "en_GB")
+        return f
+    }()
+}
+
+fileprivate func messageDetailDateString(for date: Date, calendar: Calendar = .current) -> String {
+    let time = DateFormatter.messageTime.string(from: date)
+
+    if calendar.isDateInToday(date) {
+        return "Received today at \(time)"
+    }
+
+    if calendar.isDateInYesterday(date) {
+        return "Received yesterday at \(time)"
+    }
+
+    // Same ISO week as 'now'
+    let now = Date()
+    let weekNow  = calendar.component(.weekOfYear, from: now)
+    let weekDate = calendar.component(.weekOfYear, from: date)
+    let yearNow  = calendar.component(.yearForWeekOfYear, from: now)
+    let yearDate = calendar.component(.yearForWeekOfYear, from: date)
+
+    if weekNow == weekDate && yearNow == yearDate {
+        let weekday = DateFormatter.messageWeekday.string(from: date) // e.g. "Thursday"
+        return "Received on \(weekday) at \(time)"
+    }
+
+    let full = DateFormatter.messageFullLong.string(from: date) // e.g. "4 October 2023"
+    return "Received \(full) at \(time)"
+}
+
 // MARK: Detail
 private struct MessageDetailView: View {
     let message: Message
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("From: \(message.sender)")
-                .font(.headline)
-                .foregroundStyle(.secondary)
+        ZStack {
+            Color.pageBackground.ignoresSafeArea()
 
-            Divider()
+            ScrollView {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(messageDetailDateString(for: message.date))
+                        .font(.subheadline)
+                        .foregroundStyle(.textSecondary)
 
-            Text(message.preview + "\n\n(Full message body goes here.)")
+                    Text(message.preview + "\n\n(Full message body goes here.)")
 
-            Spacer()
+                    Spacer(minLength: 0)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+            }
+            .scrollIndicators(.hidden) // optional
         }
-        .padding()
-        .navigationTitle("Message")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitle(message.sender)
+
     }
 }
 
@@ -165,7 +206,13 @@ struct MessagesView: View {
                     MessageRow(message: message)
                         .contentShape(Rectangle())
                         .onTapGesture {
-                            selectedMessage = message
+                            // mark as read immediately
+                            if let i = messages.firstIndex(where: { $0.id == message.id }) {
+                                messages[i].isRead = true
+                                selectedMessage = messages[i] // navigate to the updated message
+                            } else {
+                                selectedMessage = message
+                            }
                         }
                         // trailing swipe (right→left)
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
