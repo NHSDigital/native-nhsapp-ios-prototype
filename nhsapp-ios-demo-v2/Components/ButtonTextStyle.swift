@@ -10,11 +10,11 @@ struct NHSButtonTextStyle: ButtonStyle {
     private func foregroundColor(for role: ButtonRole?) -> Color {
         switch role {
         case .destructive:
-            return Color("NHSRed")
+            return Color.destructive
         case .cancel:
-            return Color("NHSGrey1")
+            return Color.textSecondary
         default:
-            return Color("NHSBlue")
+            return Color.accentColor
         }
     }
 }

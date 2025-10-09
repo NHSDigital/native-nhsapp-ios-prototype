@@ -9,7 +9,7 @@ struct SplashView: View {
 
     var body: some View {
         ZStack {
-            Color.accentColor.ignoresSafeArea()
+            Color("NHSBlue").ignoresSafeArea()
 
             Image("nhs_logo") // same asset as Launch Screen
                 .resizable()
