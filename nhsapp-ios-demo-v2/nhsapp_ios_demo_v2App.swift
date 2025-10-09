@@ -6,19 +6,21 @@ struct NHSApp_iOS_Demo_v2App: App {
 
     var body: some Scene {
         WindowGroup {
-            ZStack {
-                MainTabView()
-                    .opacity(showSplash ? 0 : 1)
-
+            Group {
                 if showSplash {
                     SplashView {
                         withAnimation(.easeOut(duration: 0.8)) {
                             showSplash = false
                         }
                     }
+                    .ignoresSafeArea()
                     .transition(.opacity)
+                } else {
+                    MainTabView()
+                        .transition(.opacity)
                 }
             }
+            .animation(.easeOut(duration: 0.8), value: showSplash)
         }
     }
 }

@@ -19,7 +19,7 @@ private struct MessageRow: View {
             Circle()
                 .frame(width: 8, height: 8)
                 .opacity(message.isRead ? 0 : 1)
-                .foregroundStyle(.red)
+                .foregroundStyle(.destructive)
                 .padding(.top, 8)
 
             VStack(alignment: .leading, spacing: 4) {
@@ -38,7 +38,7 @@ private struct MessageRow: View {
                             .foregroundStyle(.textSecondary)
                         Image(systemName: "chevron.right")
                             .font(.subheadline)
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(.textTertiary)
                     }
                 }
 
@@ -51,7 +51,7 @@ private struct MessageRow: View {
                     if message.isFlagged {
                         Image(systemName: "flag.fill")
                             .imageScale(.small)
-                            .foregroundStyle(.orange)
+                            .foregroundStyle(.warning)
                             .padding(.leading, 2)
                     }
                 }
@@ -200,6 +200,7 @@ struct MessagesView: View {
 
     var body: some View {
         NavigationStack {
+            
             List {
                 ForEach(messages) { message in
                     // row wrapped in a manual navigation trigger
@@ -220,7 +221,7 @@ struct MessagesView: View {
                                 messages.removeAll { $0.id == message.id }
                             } label: {
                                 Label { Text("Delete") } icon: { Image(systemName: "trash") }
-                            }
+                            }.tint(.destructive)
 
                             Button {
                                 if let i = messages.firstIndex(of: message) {
@@ -232,7 +233,7 @@ struct MessagesView: View {
                                 } icon: {
                                     Image(systemName: message.isFlagged ? "flag.slash" : "flag")
                                 }
-                            }
+                            }.tint(.warning)
                         }
                         // leading swipe (left→right)
                         .swipeActions(edge: .leading, allowsFullSwipe: false) {
