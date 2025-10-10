@@ -4,6 +4,7 @@ struct RowStyle: ViewModifier {
     enum Variant {
         case white
         case paleBlue
+        case grey
     }
 
     var variant: Variant
@@ -20,6 +21,11 @@ struct RowStyle: ViewModifier {
                 .foregroundStyle(Color("NHSAppDarkBlue"))
                 .listRowBackground(Color("NHSAppPaleBlue"))
                 .listRowSeparatorTint(Color("NHSAppDarkBlue").opacity(0.2))
+            
+        case .grey:
+            content
+                .listRowBackground(Color("NHSGrey5"))
+                .listRowSeparatorTint(Color("NHSGrey3").opacity(0.4))
         }
     }
 }

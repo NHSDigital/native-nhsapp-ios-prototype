@@ -15,15 +15,14 @@ private struct MessageRow: View {
     let message: Message
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(alignment: .center, spacing: 12) {
             Circle()
                 .frame(width: 8, height: 8)
                 .opacity(message.isRead ? 0 : 1)
                 .foregroundStyle(.destructive)
-                .padding(.top, 8)
 
             VStack(alignment: .leading, spacing: 4) {
-                HStack(alignment: .top) {
+                HStack(alignment: .center) {
                     Text(message.sender)
                         .foregroundStyle(.text)
                         .font(.headline)
@@ -31,7 +30,6 @@ private struct MessageRow: View {
 
                     Spacer()
 
-                    // date + custom chevron
                     HStack(spacing: 4) {
                         Text(messageListDateString(for: message.date))
                             .font(.subheadline)
@@ -251,9 +249,7 @@ struct MessagesView: View {
                             .tint(.blue)
                         }
                 }
-                .rowStyle(.white)
-                .listSectionSeparator(.hidden, edges: .top)
-                .listSectionSeparator(.hidden, edges: .bottom)
+                .rowStyle(.grey)
             }
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
