@@ -251,6 +251,7 @@ struct MessagesView: View {
                             .tint(.blue)
                         }
                 }
+                .rowStyle(.white)
                 .listSectionSeparator(.hidden, edges: .top)
                 .listSectionSeparator(.hidden, edges: .bottom)
             }

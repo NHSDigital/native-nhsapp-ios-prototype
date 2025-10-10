@@ -13,8 +13,8 @@ struct ExternalLinkRow: View {
                 Text(title).foregroundColor(.accentColor)
                 Spacer()
                 Image(systemName: "arrow.up.right")
-                    .foregroundColor(.accentColor)
                     .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.accentColor.opacity(0.7))
             }
             .contentShape(Rectangle())
         }

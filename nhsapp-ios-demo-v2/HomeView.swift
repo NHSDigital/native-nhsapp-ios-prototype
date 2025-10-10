@@ -30,6 +30,7 @@ struct HomeView: View {
                     Text("Footer text explaining something.")
                         .foregroundStyle(.textSecondary)
                 }
+                .rowStyle(.white)
 
                 // Custom row with title and subtitle
                 Section {
@@ -45,13 +46,15 @@ struct HomeView: View {
                     }
                     .padding(.vertical, 4)
                 }
+                .rowStyle(.white)
 
                 // Navigation links
                 Section {
-                    NavigationLink("Link 1") { DetailView(index: 0) }
-                    NavigationLink("Link 2") { DetailView(index: 1) }
-                    NavigationLink("Link 3") { DetailView(index: 3) }
+                    RowLink(title: "Link 1") { DetailView(index: 0) }
+                    RowLink(title: "Link 2") { DetailView(index: 1) }
+                    RowLink(title: "Link 3") { DetailView(index: 3) }
                 }
+                .rowStyle(.white)
 
                 // External link row (single)
                 Section {
@@ -60,6 +63,7 @@ struct HomeView: View {
                         selectedLink = LinkItem(title: "Website", url: url)
                     }
                 }
+                .rowStyle(.white)
 
                 // External link rows (multiple)
                 Section {
@@ -72,23 +76,23 @@ struct HomeView: View {
                         selectedLink = LinkItem(title: "NHS Website", url: url)
                     }
                 }
+                .rowStyle(.white)
 
                 // Custom row that is also a navigation link
                 Section {
-                    NavigationLink {
-                        DetailView(index: 4)
-                    } label: {
-                        HStack(alignment: .center) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Main title")
-                                Text("Subtitle or description text")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.textSecondary)
-                            }
+                    RowLink {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Main title")
+                            Text("Subtitle or description text")
+                                .font(.subheadline)
+                                .foregroundStyle(.textSecondary)
                         }
                         .padding(.vertical, 4)
+                    } destination: {
+                        DetailView(index: 4)
                     }
                 }
+                .rowStyle(.white)
 
                 // Custom row with title, subtitle and a navigation link
                 Section {
@@ -104,8 +108,9 @@ struct HomeView: View {
                         }
                     }
                     .padding(.vertical, 4)
-                    NavigationLink("Link") { DetailView(index: 5) }
+                    RowLink(title: "Link") { DetailView(index: 5) }
                 }
+                .rowStyle(.white)
 
                 // Custom row with title, subtitle and a navigation link
                 Section {
@@ -120,33 +125,39 @@ struct HomeView: View {
                     }
                     .padding(.vertical, 4)
                     
-                    NavigationLink("Link") { DetailView(index: 6) }
+                    RowLink(title: "Link", chevronColor: Color("NHSAppDarkBlue").opacity(0.7)) {
+                            DetailView(index: 6)
+                        }
+    
                 }
-                .foregroundStyle(Color("NHSAppDarkBlue"))
-                .listRowBackground(Color("NHSAppPaleBlue"))
+                .rowStyle(.paleBlue)
                 
 
                 // Buttons
                 Section {
                     Button("Button") { }
                 }
+                .rowStyle(.white)
 
                 Section {
                     Button("Button cancel", role: .cancel) { }
                 }
+                .rowStyle(.white)
 
                 Section {
                     Button("Button desctructive", role: .destructive) { }
                 }
+                .rowStyle(.white)
 
                 // A mixture of all the above
                 Section("All of the above") {
                     Text("Text row")
-                    NavigationLink("Link") { DetailView(index: 0) }
+                    RowLink(title: "Link") { DetailView(index: 5) }
                     Button("Button") { }
                     Button("Button cancel", role: .cancel) { }
                     Button("Button desctructive", role: .destructive) { }
                 }
+                .rowStyle(.white)
 
                 // Toggles
                 Section {
@@ -159,6 +170,7 @@ struct HomeView: View {
                             print("Notifications: \(oldValue) → \(newValue)")
                         }
                 }
+                .rowStyle(.white)
 
                 // Custom NHS buttons
                 NHSButton(title: "Primary button", style: .primary) { }
@@ -249,6 +261,7 @@ struct HomeView: View {
                 } header: {
                     Text("Trailing elements")
                 }
+                .rowStyle(.white)
 
             }
             // Present only when selectedLink != nil

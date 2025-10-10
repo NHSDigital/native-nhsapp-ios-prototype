@@ -9,6 +9,8 @@ struct NHSListDefaults: ViewModifier {
             .listSectionSpacing(20)
             .scrollContentBackground(.hidden)
             .background(Color.pageBackground)
+            .listRowBackground(Color("NHSRed"))
+            .listRowSeparatorTint(Color("NHSGrey1").opacity(0.2))
     }
 }
 
@@ -16,4 +18,8 @@ extension View {
     func nhsListStyle() -> some View {
         modifier(NHSListDefaults())
     }
+}
+
+#Preview {
+    HomeView()
 }
