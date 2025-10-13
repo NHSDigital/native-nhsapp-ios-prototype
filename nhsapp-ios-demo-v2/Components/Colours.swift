@@ -7,8 +7,9 @@ extension Color {
     static let textSecondary    = Color("NHSGrey1")
     static let textTertiary     = Color("NHSGrey3")
     static let destructive      = Color("NHSRed")
-    static let warning          = Color("NHSWarmYellow")
-    static let textLink         = Color("NHSBlue")
+    static let warning          = Color("NHSOrange")
+    static let primary         = Color("AccentColor")
+    static let textLink         = Color("AccentColor")
 }
 
 // Shorthands so you can write `.foregroundStyle(.text)` etc.
@@ -19,5 +20,6 @@ extension ShapeStyle where Self == Color {
     static var textTertiary: Color    { .textTertiary }
     static var destructive: Color     { .destructive }
     static var warning: Color         { .warning }
+    static var primary: Color         { .primary}
     static var textLink: Color        { .textLink}
 }

@@ -14,7 +14,7 @@ struct RowStyle: ViewModifier {
         case .white:
             content
                 .listRowBackground(Color("NHSWhite"))
-                .listRowSeparatorTint(Color("NHSGrey3").opacity(0.4))
+                .listRowSeparatorTint(Color("NHSGrey4"))
 
         case .paleBlue:
             content
@@ -25,7 +25,7 @@ struct RowStyle: ViewModifier {
         case .grey:
             content
                 .listRowBackground(Color("NHSGrey5"))
-                .listRowSeparatorTint(Color("NHSGrey3").opacity(0.4))
+                .listRowSeparatorTint(Color("NHSGrey4"))
         }
     }
 }

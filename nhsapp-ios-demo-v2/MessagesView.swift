@@ -246,7 +246,7 @@ struct MessagesView: View {
                                     Image(systemName: message.isRead ? "envelope.badge" : "envelope.open")
                                 }
                             }
-                            .tint(.blue)
+                            .tint(.primary)
                         }
                 }
                 .rowStyle(.grey)
