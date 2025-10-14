@@ -12,20 +12,26 @@ struct NHSButton: View {
     let title: String
     let style: Style
     let action: () -> Void
+    var icon: String? = nil  // Optional SF Symbol name
     var cornerRadius: CGFloat = 20
 
     var body: some View {
         Button(action: action) {
-            Text(title)
-                .fontWeight(.bold)
-                .frame(maxWidth: .infinity, alignment: .center)
-                .multilineTextAlignment(.center)
-                .padding(.vertical, 16)
-                .padding(.horizontal, 20)
-                .foregroundStyle(foregroundColor)
-                .background(background)
-                .overlay(borderOverlay)
-                .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+            HStack(spacing: 8) {
+                if let icon = icon {
+                    Image(systemName: icon)
+                }
+                Text(title)
+                    .fontWeight(.bold)
+            }
+            .frame(maxWidth: .infinity, alignment: .center)
+            .multilineTextAlignment(.center)
+            .padding(.vertical, 16)
+            .padding(.horizontal, 20)
+            .foregroundStyle(foregroundColor)
+            .background(background)
+            .overlay(borderOverlay)
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
         }
         .buttonStyle(.plain)
         .listRowBackground(Color.clear)

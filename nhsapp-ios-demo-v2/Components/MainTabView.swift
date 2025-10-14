@@ -2,35 +2,35 @@ import SwiftUI
 
 struct MainTabView: View {
     @State private var selection = 0
+    @StateObject private var messageStore = MessageStore()
 
     var body: some View {
         TabView(selection: $selection) {
             HomeView()
+                .tag(0)
                 .tabItem {
-                    VStack {
-                        Image(systemName: "house.fill")
-                        Text("Home")
-                    }
+                    Image(systemName: "house.fill")
+                    Text("Home")
                 }
 
             MessagesView()
+                .environmentObject(messageStore)
+                .tag(1)
+                .badge(messageStore.unreadCount)
+                .tint(Color("NHSBlue"))
                 .tabItem {
-                    VStack {
-                        Image(systemName: "bubble.left.and.bubble.right.fill")
-                        Text("Messages")
-                    }
+                    Image(systemName: "bubble.left.and.bubble.right.fill")
+                    Text("Messages")
                 }
 
             ProfileView()
+                .tag(2)
                 .tabItem {
-                    VStack {
-                        Image(systemName: "person.crop.circle.fill")
-                        Text("Profile")
-                    }
+                    Image(systemName: "person.crop.circle.fill")
+                    Text("Profile")
                 }
         }
     }
-
 }
 
 #Preview {

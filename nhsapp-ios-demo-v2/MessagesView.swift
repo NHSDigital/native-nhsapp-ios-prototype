@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 // MARK: Model
 struct Message: Identifiable, Hashable {
@@ -6,9 +7,47 @@ struct Message: Identifiable, Hashable {
     var sender: String
     var preview: String
     var date: Date
-    var isRead = false
-    var isFlagged = false
+    var isRead: Bool
+    var isFlagged: Bool
+    var content: String
+    
+    init(sender: String, preview: String, date: Date, isRead: Bool = false, isFlagged: Bool = false, content: String = "") {
+        self.sender = sender
+        self.preview = preview
+        self.date = date
+        self.isRead = isRead
+        self.isFlagged = isFlagged
+        self.content = content
+    }
 }
+
+// MARK: Sample Data
+let sampleMessages: [Message] = [
+    .init(sender: "Portland Street Great Westood Surgery",
+          preview: "Patient survey reminder. The Patient feedback survey is about to close. Have your say about Portland Street Great Westood Surgery by providing us with your thoughts.",
+          date: Calendar.current.date(byAdding: .hour, value: -3, to: .now)!,
+          isRead: false,
+          content: "Dear Patient,\n\nThe Patient feedback survey is about to close. Have your say about Portland Street Great Westood Surgery by providing us with your thoughts.\n\nYour feedback helps us improve our services.\n\nThank you,\nPortland Street Great Westood Surgery"),
+    
+    .init(sender: "Range Surgery",
+          preview: "Dear Mary, we would like to ask you a few questions about smoking. If you smoke, select SMOKE. If you're an ex smoker, select EX. If you have never smoked, select NEVER.",
+          date: Calendar.current.date(byAdding: .day, value: -1, to: .now)!,
+          isRead: false,
+          content: "Dear Mary,\n\nWe would like to ask you a few questions about smoking.\n\nIf you smoke, select SMOKE.\nIf you're an ex smoker, select EX.\nIf you have never smoked, select NEVER.\n\nYour response helps us provide better care.\n\nBest regards,\nRange Surgery"),
+    
+    .init(sender: "NHS App",
+          preview: "Your next COVID-19 vaccination. I'd like to invite you to get your COVID-19 vaccination this spring.",
+          date: Calendar.current.date(byAdding: .day, value: -6, to: .now)!,
+          isRead: true,
+          content: "Dear Patient,\n\nI'd like to invite you to get your COVID-19 vaccination this spring.\n\nSpring boosters are now available for eligible patients. Book your appointment through the NHS App or contact your GP surgery.\n\nStay protected,\nNHS"),
+    
+    .init(sender: "Wealden Ridge Surgery",
+          preview: "Your digital NHS health check is due by 28 August 2025. This is a free check-up of your health.",
+          date: Calendar.current.date(byAdding: .day, value: -8, to: .now)!,
+          isRead: true,
+          isFlagged: true,
+          content: "Dear Patient,\n\nYour digital NHS health check is due by 28 August 2025. This is a free check-up of your health.\n\nPlease complete your health check as soon as possible.\n\nBest regards,\nWealden Ridge Surgery")
+]
 
 // MARK: Row
 private struct MessageRow: View {
@@ -98,7 +137,6 @@ fileprivate func messageListDateString(for date: Date, calendar: Calendar = .cur
         return "Yesterday"
     }
 
-    // Same week check (ISO week)
     let weekNow  = calendar.component(.weekOfYear, from: now)
     let weekDate = calendar.component(.weekOfYear, from: date)
     let yearNow  = calendar.component(.yearForWeekOfYear, from: now)
@@ -116,7 +154,7 @@ fileprivate func messageListDateString(for date: Date, calendar: Calendar = .cur
 fileprivate extension DateFormatter {
     static let messageFullLong: DateFormatter = {
         let f = DateFormatter()
-        f.dateFormat = "d MMMM yyyy"      // e.g. "4 October 2023"
+        f.dateFormat = "d MMMM yyyy"
         f.locale = Locale(identifier: "en_GB")
         return f
     }()
@@ -133,7 +171,6 @@ fileprivate func messageDetailDateString(for date: Date, calendar: Calendar = .c
         return "Received yesterday at \(time)"
     }
 
-    // Same ISO week as 'now'
     let now = Date()
     let weekNow  = calendar.component(.weekOfYear, from: now)
     let weekDate = calendar.component(.weekOfYear, from: date)
@@ -141,126 +178,292 @@ fileprivate func messageDetailDateString(for date: Date, calendar: Calendar = .c
     let yearDate = calendar.component(.yearForWeekOfYear, from: date)
 
     if weekNow == weekDate && yearNow == yearDate {
-        let weekday = DateFormatter.messageWeekday.string(from: date) // e.g. "Thursday"
+        let weekday = DateFormatter.messageWeekday.string(from: date)
         return "Received on \(weekday) at \(time)"
     }
 
-    let full = DateFormatter.messageFullLong.string(from: date) // e.g. "4 October 2023"
+    let full = DateFormatter.messageFullLong.string(from: date)
     return "Received \(full) at \(time)"
 }
 
 // MARK: Detail
 private struct MessageDetailView: View {
     let message: Message
+    @EnvironmentObject var messageStore: MessageStore
+    @Environment(\.dismiss) var dismiss
 
     var body: some View {
         ZStack {
             Color.pageBackground.ignoresSafeArea()
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(messageDetailDateString(for: message.date))
-                        .font(.subheadline)
-                        .foregroundStyle(.textSecondary)
+            VStack(spacing: 0) {
+                // Message content
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(messageDetailDateString(for: message.date))
+                            .font(.subheadline)
+                            .foregroundStyle(.textSecondary)
+                            .padding(.bottom, 16)
+                            .padding(.top, -16)
 
-                    Text(message.preview + "\n\n(Full message body goes here.)")
+                        Text(message.content.isEmpty ? message.preview : message.content)
 
-                    Spacer(minLength: 0)
+                        Spacer(minLength: 0)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
+                .scrollIndicators(.hidden)
+                
+                // Bottom action buttons
+                VStack(spacing: 0) {
+                    Divider()
+                    
+                    HStack(spacing: 12) {
+                        // Flag/Unflag button
+                        NHSButton(title: message.isFlagged ? "Unflag" : "Flag", style: .secondary) {
+                            if let index = messageStore.messages.firstIndex(where: { $0.id == message.id }) {
+                                messageStore.messages[index].isFlagged.toggle()
+                            }
+                        }
+                        // Remove message
+                        NHSButton(title: "Remove", style: .warning) {
+                            messageStore.removeMessage(message)
+                            dismiss()
+                        }
+                    }
+                    .padding()
+                    .background(Color.pageBackground)
+                }
             }
-            .scrollIndicators(.hidden) // optional
         }
         .navigationTitle(message.sender)
+        .toolbar(.hidden, for: .tabBar)
+    }
+}
 
+// MARK: - Removed Messages View
+private struct RemovedMessagesView: View {
+    @EnvironmentObject var messageStore: MessageStore
+    @State private var selectedMessage: Message?
+
+    var body: some View {
+        ZStack {
+            Color.pageBackground.ignoresSafeArea()
+            
+            if messageStore.removedMessages.isEmpty {
+                VStack(spacing: 8) {
+                    Text("No removed messages.")
+                        .font(.body)
+                        .foregroundStyle(.textSecondary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                List {
+                    ForEach(messageStore.removedMessages) { message in
+                        MessageRow(message: message)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                selectedMessage = message
+                            }
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                Button {
+                                    messageStore.restoreMessage(message)
+                                } label: {
+                                    Label { Text("Restore") } icon: { Image(systemName: "arrow.uturn.backward") }
+                                }.tint(Color("NHSBlue"))
+                                
+                            }
+                    }
+                    .rowStyle(.grey)
+                }
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+                .background(Color.pageBackground)
+                .navigationDestination(item: $selectedMessage) { message in
+                    RemovedMessageDetailView(message: message)
+                }
+            }
+        }
+        .navigationTitle("Removed messages")
+    }
+}
+
+// MARK: - Removed Message Detail View
+private struct RemovedMessageDetailView: View {
+    let message: Message
+    @EnvironmentObject var messageStore: MessageStore
+    @Environment(\.dismiss) var dismiss
+
+    var body: some View {
+        ZStack {
+            Color.pageBackground.ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(messageDetailDateString(for: message.date))
+                            .font(.subheadline)
+                            .foregroundStyle(.textSecondary)
+                            .padding(.bottom, 16)
+                            .padding(.top, -16)
+
+                        Text(message.content.isEmpty ? message.preview : message.content)
+
+                        Spacer(minLength: 0)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+                }
+                .scrollIndicators(.hidden)
+                
+                VStack(spacing: 0) {
+                    Divider()
+                    
+                    HStack(spacing: 12) {
+                        NHSButton(
+                            title: "Restore message",
+                            style: .secondary,
+                            action: {
+                                messageStore.restoreMessage(message)
+                                dismiss()
+                            },
+                            icon: "arrow.uturn.backward"
+                        )
+
+                    }
+                    .padding()
+                    .background(Color.pageBackground)
+                }
+            }
+        }
+        .navigationTitle(message.sender)
+        .toolbar(.hidden, for: .tabBar)
+    }
+}
+
+// MARK: - Message Store
+class MessageStore: ObservableObject {
+    @Published var messages: [Message] = sampleMessages
+    @Published var removedMessages: [Message] = []
+    
+    var unreadCount: Int {
+        messages.filter { !$0.isRead }.count
+    }
+    
+    func removeMessage(_ message: Message) {
+        if let index = messages.firstIndex(where: { $0.id == message.id }) {
+            let removed = messages.remove(at: index)
+            removedMessages.append(removed)
+        }
+    }
+    
+    func restoreMessage(_ message: Message) {
+        if let index = removedMessages.firstIndex(where: { $0.id == message.id }) {
+            let restored = removedMessages.remove(at: index)
+            messages.append(restored)
+        }
+    }
+    
+    func permanentlyDelete(_ message: Message) {
+        removedMessages.removeAll { $0.id == message.id }
     }
 }
 
 // MARK: List + Navigation + Swipe
 struct MessagesView: View {
-    @State private var messages: [Message] = [
-        .init(sender: "Portland Street Great Westood Surgery",
-              preview: "Patient survey reminder. The Patient feedback survey is about to close. Have your say about Portland Street Great Westood Surgery by providing us with your thoughts.",
-              date: Calendar.current.date(byAdding: .hour, value: -3, to: .now)!,
-              isRead: false),
-        .init(sender: "Range Surgery",
-              preview: "Dear Mary, we would like to ask you a few questions about smoking. If you smoke, select SMOKE. If you're an ex smoker, select EX. If you have never smoked, select NEVER.",
-              date: Calendar.current.date(byAdding: .day, value: -1, to: .now)!,
-              isRead: true, isFlagged: true),
-        .init(sender: "NHS App",
-              preview: "Your next COVID-19 vaccination. I'd like to invite you to get your COVID-19 vaccination this spring.",
-              date: Calendar.current.date(byAdding: .day, value: -6, to: .now)!,
-              isRead: false)
-    ]
-
+    @EnvironmentObject var messageStore: MessageStore
     @State private var selectedMessage: Message?
 
     var body: some View {
         NavigationStack {
-            
-            List {
-                ForEach(messages) { message in
-                    // row wrapped in a manual navigation trigger
-                    MessageRow(message: message)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            // mark as read immediately
-                            if let i = messages.firstIndex(where: { $0.id == message.id }) {
-                                messages[i].isRead = true
-                                selectedMessage = messages[i] // navigate to the updated message
-                            } else {
-                                selectedMessage = message
-                            }
-                        }
-                        // trailing swipe (right→left)
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            Button(role: .destructive) {
-                                messages.removeAll { $0.id == message.id }
-                            } label: {
-                                Label { Text("Delete") } icon: { Image(systemName: "trash") }
-                            }.tint(.destructive)
-
-                            Button {
-                                if let i = messages.firstIndex(of: message) {
-                                    messages[i].isFlagged.toggle()
-                                }
-                            } label: {
-                                Label {
-                                    Text(message.isFlagged ? "Unflag" : "Flag")
-                                } icon: {
-                                    Image(systemName: message.isFlagged ? "flag.slash" : "flag")
-                                }
-                            }.tint(.warning)
-                        }
-                        // leading swipe (left→right)
-                        .swipeActions(edge: .leading, allowsFullSwipe: false) {
-                            Button {
-                                if let i = messages.firstIndex(of: message) {
-                                    messages[i].isRead.toggle()
-                                }
-                            } label: {
-                                Label {
-                                    Text(message.isRead ? "Mark Unread" : "Mark Read")
-                                } icon: {
-                                    Image(systemName: message.isRead ? "envelope.badge" : "envelope.open")
-                                }
-                            }
-                            .tint(.primary)
-                        }
+            if messageStore.messages.isEmpty {
+                VStack(spacing: 8) {
+                    Text("You have no messages.")
+                        .font(.body)
+                        .foregroundStyle(.textSecondary)
                 }
-                .rowStyle(.grey)
-            }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
-            .navigationTitle("Messages")
-            .background(Color.pageBackground)
-            // manual destination
-            .navigationDestination(item: $selectedMessage) { message in
-                MessageDetailView(message: message)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.pageBackground)
+                .navigationTitle("Messages")
+            } else {
+                List {
+                    ForEach(messageStore.messages) { message in
+                        MessageRow(message: message)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                if let i = messageStore.messages.firstIndex(where: { $0.id == message.id }) {
+                                    messageStore.messages[i].isRead = true
+                                    selectedMessage = messageStore.messages[i]
+                                } else {
+                                    selectedMessage = message
+                                }
+                            }
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                Button(role: .destructive) {
+                                    messageStore.removeMessage(message)
+                                } label: {
+                                    Label { Text("Remove") } icon: { Image(systemName: "trash") }
+                                }.tint(.destructive)
+
+                                Button {
+                                    if let i = messageStore.messages.firstIndex(of: message) {
+                                        messageStore.messages[i].isFlagged.toggle()
+                                    }
+                                } label: {
+                                    Label {
+                                        Text(message.isFlagged ? "Unflag" : "Flag")
+                                    } icon: {
+                                        Image(systemName: message.isFlagged ? "flag.slash" : "flag")
+                                    }
+                                }.tint(.warning)
+                            }
+                            .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                                Button {
+                                    if let i = messageStore.messages.firstIndex(of: message) {
+                                        messageStore.messages[i].isRead.toggle()
+                                    }
+                                } label: {
+                                    Label {
+                                        Text(message.isRead ? "Mark Unread" : "Mark Read")
+                                    } icon: {
+                                        Image(systemName: message.isRead ? "envelope.badge" : "envelope.open")
+                                    }
+                                }
+                                .tint(.primary)
+                            }
+                    }
+                    .rowStyle(.grey)
+                    
+                    // Removed messages link
+                    if !messageStore.removedMessages.isEmpty {
+                        NavigationLink {
+                            RemovedMessagesView()
+                        } label: {
+                            HStack {
+                                Text("Removed messages")
+                                Spacer()
+                                Text("\(messageStore.removedMessages.count)")
+                                    .foregroundStyle(.textSecondary)
+                            }
+                        }
+                        .rowStyle(.grey)
+                        .listRowInsets(EdgeInsets(top: 11, leading: 36, bottom: 11, trailing: 16))
+                    }
+                }
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+                .navigationTitle("Messages")
+                .background(Color.pageBackground)
+                .navigationDestination(item: $selectedMessage) { message in
+                    MessageDetailView(message: message)
+                }
             }
         }
     }
 }
 
-#Preview { MessagesView() }
+#Preview {
+    MessagesView()
+        .environmentObject(MessageStore())
+}
