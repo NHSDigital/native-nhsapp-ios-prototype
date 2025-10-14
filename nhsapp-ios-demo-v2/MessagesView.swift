@@ -186,12 +186,16 @@ fileprivate func messageDetailDateString(for date: Date, calendar: Calendar = .c
     return "Received \(full) at \(time)"
 }
 
-// MARK: Detail
 private struct MessageDetailView: View {
     let message: Message
     @EnvironmentObject var messageStore: MessageStore
     @Environment(\.dismiss) var dismiss
     @State private var showingRemoveAlert = false
+    
+    // Computed property to get current message state
+    private var currentMessage: Message {
+        messageStore.messages.first(where: { $0.id == message.id }) ?? message
+    }
 
     var body: some View {
         ZStack {
@@ -204,6 +208,21 @@ private struct MessageDetailView: View {
                         .foregroundStyle(.textSecondary)
                         .padding(.bottom, 16)
                         .padding(.top, -16)
+                    
+                    // Flagged badge
+                    if currentMessage.isFlagged {
+                        HStack(spacing: 4) {
+                            Image(systemName: "flag.fill")
+                            Text("Flagged")
+                        }
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color("NHSOrange"))
+                        .clipShape(Capsule())
+                    }
 
                     Text(message.content.isEmpty ? message.preview : message.content)
 
@@ -220,7 +239,7 @@ private struct MessageDetailView: View {
         .toolbar {
             ToolbarItemGroup(placement: .bottomBar) {
                 // Flag/Unflag button
-                Button(message.isFlagged ? "Unflag" : "Flag") {
+                Button(currentMessage.isFlagged ? "Unflag" : "Flag") {
                     if let index = messageStore.messages.firstIndex(where: { $0.id == message.id }) {
                         messageStore.messages[index].isFlagged.toggle()
                     }
@@ -298,6 +317,11 @@ private struct RemovedMessageDetailView: View {
     let message: Message
     @EnvironmentObject var messageStore: MessageStore
     @Environment(\.dismiss) var dismiss
+    
+    // Computed property to get current message state from removed messages
+    private var currentMessage: Message {
+        messageStore.removedMessages.first(where: { $0.id == message.id }) ?? message
+    }
 
     var body: some View {
         ZStack {
@@ -310,6 +334,21 @@ private struct RemovedMessageDetailView: View {
                         .foregroundStyle(.textSecondary)
                         .padding(.bottom, 16)
                         .padding(.top, -16)
+                    
+                    // Flagged badge
+                    if currentMessage.isFlagged {
+                        HStack(spacing: 4) {
+                            Image(systemName: "flag.fill")
+                            Text("Flagged")
+                        }
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color("NHSOrange"))
+                        .clipShape(Capsule())
+                    }
 
                     Text(message.content.isEmpty ? message.preview : message.content)
 
@@ -325,7 +364,15 @@ private struct RemovedMessageDetailView: View {
         .navigationBarTitleDisplayMode(.large)
         .toolbar(.hidden, for: .tabBar)
         .toolbar {
-            ToolbarItem(placement: .bottomBar) {
+            ToolbarItemGroup(placement: .bottomBar) {
+                Button(currentMessage.isFlagged ? "Unflag" : "Flag") {
+                    if let index = messageStore.removedMessages.firstIndex(where: { $0.id == message.id }) {
+                        messageStore.removedMessages[index].isFlagged.toggle()
+                    }
+                }
+                
+                Spacer()
+                
                 Button("Restore message") {
                     messageStore.restoreMessage(message)
                     dismiss()
