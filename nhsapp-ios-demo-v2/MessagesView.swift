@@ -191,54 +191,58 @@ private struct MessageDetailView: View {
     let message: Message
     @EnvironmentObject var messageStore: MessageStore
     @Environment(\.dismiss) var dismiss
+    @State private var showingRemoveAlert = false
 
     var body: some View {
         ZStack {
             Color.pageBackground.ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                // Message content
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text(messageDetailDateString(for: message.date))
-                            .font(.subheadline)
-                            .foregroundStyle(.textSecondary)
-                            .padding(.bottom, 16)
-                            .padding(.top, -16)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(messageDetailDateString(for: message.date))
+                        .font(.subheadline)
+                        .foregroundStyle(.textSecondary)
+                        .padding(.bottom, 16)
+                        .padding(.top, -16)
 
-                        Text(message.content.isEmpty ? message.preview : message.content)
+                    Text(message.content.isEmpty ? message.preview : message.content)
 
-                        Spacer(minLength: 0)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding()
+                    Spacer(minLength: 0)
                 }
-                .scrollIndicators(.hidden)
-                
-                // Bottom action buttons
-                VStack(spacing: 0) {
-                    Divider()
-                    
-                    HStack(spacing: 12) {
-                        // Flag/Unflag button
-                        NHSButton(title: message.isFlagged ? "Unflag" : "Flag", style: .secondary) {
-                            if let index = messageStore.messages.firstIndex(where: { $0.id == message.id }) {
-                                messageStore.messages[index].isFlagged.toggle()
-                            }
-                        }
-                        // Remove message
-                        NHSButton(title: "Remove", style: .warning) {
-                            messageStore.removeMessage(message)
-                            dismiss()
-                        }
-                    }
-                    .padding()
-                    .background(Color.pageBackground)
-                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20)
+                .padding(.vertical)
             }
+            .scrollIndicators(.hidden)
         }
         .navigationTitle(message.sender)
         .toolbar(.hidden, for: .tabBar)
+        .toolbar {
+            ToolbarItemGroup(placement: .bottomBar) {
+                // Flag/Unflag button
+                Button(message.isFlagged ? "Unflag" : "Flag") {
+                    if let index = messageStore.messages.firstIndex(where: { $0.id == message.id }) {
+                        messageStore.messages[index].isFlagged.toggle()
+                    }
+                }
+                
+                Spacer()
+                
+                // Remove message
+                Button("Remove", role: .destructive) {
+                    showingRemoveAlert = true
+                }
+            }
+        }
+        .alert("Remove Message", isPresented: $showingRemoveAlert) {
+            Button("Remove", role: .destructive) {
+                messageStore.removeMessage(message)
+                dismiss()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Are you sure you want to remove this message?")
+        }
     }
 }
 
@@ -286,10 +290,10 @@ private struct RemovedMessagesView: View {
             }
         }
         .navigationTitle("Removed messages")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
-// MARK: - Removed Message Detail View
 private struct RemovedMessageDetailView: View {
     let message: Message
     @EnvironmentObject var messageStore: MessageStore
@@ -299,46 +303,35 @@ private struct RemovedMessageDetailView: View {
         ZStack {
             Color.pageBackground.ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text(messageDetailDateString(for: message.date))
-                            .font(.subheadline)
-                            .foregroundStyle(.textSecondary)
-                            .padding(.bottom, 16)
-                            .padding(.top, -16)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(messageDetailDateString(for: message.date))
+                        .font(.subheadline)
+                        .foregroundStyle(.textSecondary)
+                        .padding(.bottom, 16)
+                        .padding(.top, -16)
 
-                        Text(message.content.isEmpty ? message.preview : message.content)
+                    Text(message.content.isEmpty ? message.preview : message.content)
 
-                        Spacer(minLength: 0)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding()
+                    Spacer(minLength: 0)
                 }
-                .scrollIndicators(.hidden)
-                
-                VStack(spacing: 0) {
-                    Divider()
-                    
-                    HStack(spacing: 12) {
-                        NHSButton(
-                            title: "Restore message",
-                            style: .secondary,
-                            action: {
-                                messageStore.restoreMessage(message)
-                                dismiss()
-                            },
-                            icon: "arrow.uturn.backward"
-                        )
-
-                    }
-                    .padding()
-                    .background(Color.pageBackground)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20)
+                .padding(.vertical)
+            }
+            .scrollIndicators(.hidden)
+        }
+        .navigationTitle(message.sender)
+        .navigationBarTitleDisplayMode(.large)
+        .toolbar(.hidden, for: .tabBar)
+        .toolbar {
+            ToolbarItem(placement: .bottomBar) {
+                Button("Restore message") {
+                    messageStore.restoreMessage(message)
+                    dismiss()
                 }
             }
         }
-        .navigationTitle(message.sender)
-        .toolbar(.hidden, for: .tabBar)
     }
 }
 
