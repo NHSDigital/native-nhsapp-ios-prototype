@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct MainTabView: View {
+    
     @State private var selection = 0
     @StateObject private var messageStore = MessageStore()
 
@@ -17,7 +18,6 @@ struct MainTabView: View {
                 .environmentObject(messageStore)
                 .tag(1)
                 .badge(messageStore.unreadCount)
-                .tint(Color("NHSBlue"))
                 .tabItem {
                     Image(systemName: "bubble.left.and.bubble.right.fill")
                     Text("Messages")

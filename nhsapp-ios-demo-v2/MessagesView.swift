@@ -21,7 +21,7 @@ struct Message: Identifiable, Hashable {
     }
 }
 
-// MARK: Sample Data
+// MARK: Sample Message Data
 let sampleMessages: [Message] = [
     .init(sender: "Portland Street Great Westood Surgery",
           preview: "Patient survey reminder. The Patient feedback survey is about to close. Have your say about Portland Street Great Westood Surgery by providing us with your thoughts.",
@@ -49,7 +49,7 @@ let sampleMessages: [Message] = [
           content: "Dear Patient,\n\nYour digital NHS health check is due by 28 August 2025. This is a free check-up of your health.\n\nPlease complete your health check as soon as possible.\n\nBest regards,\nWealden Ridge Surgery")
 ]
 
-// MARK: Row
+// MARK: Message row
 private struct MessageRow: View {
     let message: Message
 
@@ -149,7 +149,7 @@ fileprivate func messageListDateString(for date: Date, calendar: Calendar = .cur
     return DateFormatter.messageFull.string(from: date)
 }
 
-// MARK: - Preferred full date format for detail view
+// MARK: - Full date format for detail view
 
 fileprivate extension DateFormatter {
     static let messageFullLong: DateFormatter = {
@@ -186,6 +186,7 @@ fileprivate func messageDetailDateString(for date: Date, calendar: Calendar = .c
     return "Received \(full) at \(time)"
 }
 
+// MARK: - Message Detail View
 private struct MessageDetailView: View {
     let message: Message
     @EnvironmentObject var messageStore: MessageStore
@@ -203,28 +204,24 @@ private struct MessageDetailView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text(messageDetailDateString(for: message.date))
-                        .font(.subheadline)
-                        .foregroundStyle(.textSecondary)
-                        .padding(.bottom, 16)
-                        .padding(.top, -16)
-                    
-                    // Flagged badge
-                    if currentMessage.isFlagged {
-                        HStack(spacing: 4) {
+
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                        Text(messageDetailDateString(for: message.date))
+                            .font(.subheadline)
+                            .foregroundStyle(.textSecondary)
+                        
+                        Spacer()
+
+                        if currentMessage.isFlagged {
                             Image(systemName: "flag.fill")
-                            Text("Flagged")
+                                .imageScale(.small)
+                                .foregroundStyle(.warning)
                         }
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color("NHSOrange"))
-                        .clipShape(Capsule())
                     }
+                    
 
                     Text(message.content.isEmpty ? message.preview : message.content)
+                        .padding(.top, 16)
 
                     Spacer(minLength: 0)
                 }
@@ -235,21 +232,25 @@ private struct MessageDetailView: View {
             .scrollIndicators(.hidden)
         }
         .navigationTitle(message.sender)
-        .toolbar(.hidden, for: .tabBar)
         .toolbar {
-            ToolbarItemGroup(placement: .bottomBar) {
-                // Flag/Unflag button
-                Button(currentMessage.isFlagged ? "Unflag" : "Flag") {
+            ToolbarItem {
+                Button {
                     if let index = messageStore.messages.firstIndex(where: { $0.id == message.id }) {
                         messageStore.messages[index].isFlagged.toggle()
                     }
+                } label: {
+                    Label {
+                        Text(currentMessage.isFlagged ? "Unflag" : "Flag")
+                    } icon: {
+                        Image(systemName: currentMessage.isFlagged ? "flag.slash" : "flag")
+                    }
                 }
-                
-                Spacer()
-                
-                // Remove message
-                Button("Remove", role: .destructive) {
+            }
+            ToolbarItem {
+                Button(role: .destructive) {
                     showingRemoveAlert = true
+                } label: {
+                    Label { Text("Remove") } icon: { Image(systemName: "trash") }
                 }
             }
         }
@@ -294,7 +295,7 @@ private struct RemovedMessagesView: View {
                                     messageStore.restoreMessage(message)
                                 } label: {
                                     Label { Text("Restore") } icon: { Image(systemName: "arrow.uturn.backward") }
-                                }.tint(Color("NHSBlue"))
+                                }.tint(Color.textLink)
                                 
                             }
                     }
@@ -313,6 +314,7 @@ private struct RemovedMessagesView: View {
     }
 }
 
+// MARK: - Removed Message Detail View
 private struct RemovedMessageDetailView: View {
     let message: Message
     @EnvironmentObject var messageStore: MessageStore
@@ -334,21 +336,6 @@ private struct RemovedMessageDetailView: View {
                         .foregroundStyle(.textSecondary)
                         .padding(.bottom, 16)
                         .padding(.top, -16)
-                    
-                    // Flagged badge
-                    if currentMessage.isFlagged {
-                        HStack(spacing: 4) {
-                            Image(systemName: "flag.fill")
-                            Text("Flagged")
-                        }
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color("NHSOrange"))
-                        .clipShape(Capsule())
-                    }
 
                     Text(message.content.isEmpty ? message.preview : message.content)
 
@@ -362,18 +349,9 @@ private struct RemovedMessageDetailView: View {
         }
         .navigationTitle(message.sender)
         .navigationBarTitleDisplayMode(.large)
-        .toolbar(.hidden, for: .tabBar)
         .toolbar {
-            ToolbarItemGroup(placement: .bottomBar) {
-                Button(currentMessage.isFlagged ? "Unflag" : "Flag") {
-                    if let index = messageStore.removedMessages.firstIndex(where: { $0.id == message.id }) {
-                        messageStore.removedMessages[index].isFlagged.toggle()
-                    }
-                }
-                
-                Spacer()
-                
-                Button("Restore message") {
+            ToolbarItem {
+                Button("Restore") {
                     messageStore.restoreMessage(message)
                     dismiss()
                 }
@@ -470,7 +448,7 @@ struct MessagesView: View {
                                         Image(systemName: message.isRead ? "envelope.badge" : "envelope.open")
                                     }
                                 }
-                                .tint(.primary)
+                                .tint(Color.textLink)
                             }
                     }
                     .rowStyle(.grey)
