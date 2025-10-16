@@ -254,14 +254,14 @@ private struct MessageDetailView: View {
                 }
             }
         }
-        .alert("Remove Message", isPresented: $showingRemoveAlert) {
+        .alert("Remove message", isPresented: $showingRemoveAlert) {
             Button("Remove", role: .destructive) {
                 messageStore.removeMessage(message)
                 dismiss()
             }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("Are you sure you want to remove this message?")
+            Text("You can restore the message at any time from your removed messages.")
         }
     }
 }
