@@ -470,6 +470,11 @@ struct MessagesView: View {
         case .flagged: return flaggedCount
         }
     }
+    
+    private var unreadSubtitle: String {
+        let count = unreadCount
+        return count > 0 ? "\(count) unread" : "Updated just now"
+    }
 
     var body: some View {
         NavigationStack {
@@ -566,6 +571,10 @@ struct MessagesView: View {
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
                 .navigationTitle("Messages")
+                .navigationSubtitle(
+                    Text(unreadSubtitle)
+                        .font(.title2)
+                )
                 .navigationBarTitleDisplayMode(.large) // NEW: keeps search under title
                 .background(Color.pageBackground)
                 .navigationDestination(item: $selectedMessage) { message in
@@ -600,18 +609,22 @@ struct MessagesView: View {
         ToolbarItem(placement: .topBarTrailing) {
             Menu {
                 Picker("Filter", selection: $filter) {
-                    Text("All").tag(Filter.all)
-                    Text("Unread (\(unreadCount))").tag(Filter.unread)
-                    Text("Flagged (\(flaggedCount))").tag(Filter.flagged)
+                    Label("All", systemImage: "tray")
+                        .tag(Filter.all)
+
+                    Label("Unread (\(unreadCount))", systemImage: "envelope.badge")
+                        .tag(Filter.unread)
+
+                    Label("Flagged (\(flaggedCount))", systemImage: "flag")
+                        .tag(Filter.flagged)
                 }
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "line.3.horizontal.decrease")
                         .symbolRenderingMode(.hierarchical)
 
-                    // show text when not .all
                     if filter != .all {
-                        Text("\(filter.rawValue) (\(activeFilterCount))")
+                        Text("\(filter.rawValue)")
                             .font(.subheadline)
                             .transition(.opacity.combined(with: .move(edge: .trailing)))
                     }
@@ -619,7 +632,7 @@ struct MessagesView: View {
                 .animation(.easeInOut(duration: 0.2), value: filter)
                 .animation(.easeInOut(duration: 0.2), value: activeFilterCount)
                 .accessibilityLabel("Filter messages")
-                .accessibilityValue("\(filter.rawValue), \(activeFilterCount)")
+                .accessibilityValue("\(filter.rawValue)")
                 .accessibilityHint("Opens menu to change which messages are shown")
             }
         }
