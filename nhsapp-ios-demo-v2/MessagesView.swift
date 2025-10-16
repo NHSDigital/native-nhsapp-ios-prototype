@@ -462,6 +462,14 @@ struct MessagesView: View {
     // Counts (existing)
     private var unreadCount: Int { messageStore.messages.filter { !$0.isRead }.count }
     private var flaggedCount: Int { messageStore.messages.filter { $0.isFlagged }.count }
+    
+    private var activeFilterCount: Int {
+        switch filter {
+        case .all:     return messageStore.messages.count
+        case .unread:  return unreadCount
+        case .flagged: return flaggedCount
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -485,15 +493,11 @@ struct MessagesView: View {
                 List {
                     // Empty state for current filter + search
                     if displayedMessages.isEmpty {
-                        Section {
-                            Text(emptyStateText)
-                                .foregroundStyle(.textSecondary)
-                                .accessibilityAddTraits(.isStaticText)
-                        } header: {
-                            Text("Messages")
-                                .accessibilityAddTraits(.isHeader)
-                        }
-                        .rowStyle(.grey)
+                        Text(emptyStateText)
+                            .foregroundStyle(.textSecondary)
+                            .accessibilityAddTraits(.isStaticText)
+                            .listRowSeparator(.hidden)
+                            .rowStyle(.grey)
                     }
 
                     ForEach(displayedMessages) { message in
@@ -601,11 +605,23 @@ struct MessagesView: View {
                     Text("Flagged (\(flaggedCount))").tag(Filter.flagged)
                 }
             } label: {
-                Image(systemName: "line.3.horizontal.decrease")
+                HStack(spacing: 6) {
+                    Image(systemName: "line.3.horizontal.decrease")
+                        .symbolRenderingMode(.hierarchical)
+
+                    // show text when not .all
+                    if filter != .all {
+                        Text("\(filter.rawValue) (\(activeFilterCount))")
+                            .font(.subheadline)
+                            .transition(.opacity.combined(with: .move(edge: .trailing)))
+                    }
+                }
+                .animation(.easeInOut(duration: 0.2), value: filter)
+                .animation(.easeInOut(duration: 0.2), value: activeFilterCount)
+                .accessibilityLabel("Filter messages")
+                .accessibilityValue("\(filter.rawValue), \(activeFilterCount)")
+                .accessibilityHint("Opens menu to change which messages are shown")
             }
-            .accessibilityLabel("Filter messages")
-            .accessibilityValue(filter.rawValue)
-            .accessibilityHint("Opens menu to change which messages are shown")
         }
     }
 }
