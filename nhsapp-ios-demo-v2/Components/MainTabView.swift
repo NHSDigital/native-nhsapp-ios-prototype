@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct MainTabView: View {
-    
     @State private var selection = 0
     @StateObject private var messageStore = MessageStore()
 
@@ -10,8 +9,10 @@ struct MainTabView: View {
             HomeView()
                 .tag(0)
                 .tabItem {
-                    Image(systemName: "house.fill")
-                    Text("Home")
+                    Group {
+                        Label("Home", systemImage: "house")
+                    }
+                    .environment(\.symbolVariants, selection == 0 ? .fill : .none)
                 }
 
             MessagesView()
@@ -19,20 +20,23 @@ struct MainTabView: View {
                 .tag(1)
                 .badge(messageStore.unreadCount)
                 .tabItem {
-                    Image(systemName: "bubble.left.and.bubble.right.fill")
-                    Text("Messages")
+                    Group {
+                        Label("Messages", systemImage: "bubble.left.and.bubble.right")
+                    }
+                    .environment(\.symbolVariants, selection == 1 ? .fill : .none)
                 }
 
             ProfileView()
                 .tag(2)
                 .tabItem {
-                    Image(systemName: "person.crop.circle.fill")
-                    Text("Profile")
+                    Group {
+                        Label("Profile", systemImage: "person.crop.circle")
+                    }
+                    .environment(\.symbolVariants, selection == 2 ? .fill : .none)
                 }
         }
     }
 }
 
-#Preview {
-    MainTabView()
-}
+#Preview { MainTabView() }
+

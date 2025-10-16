@@ -3,7 +3,7 @@ import SwiftUI
 @main
 struct NHSApp_iOS_Demo_v2App: App {
     @State private var showSplash = true
-
+    
     var body: some Scene {
         WindowGroup {
             Group {

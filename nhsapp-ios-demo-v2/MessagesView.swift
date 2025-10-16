@@ -46,7 +46,33 @@ let sampleMessages: [Message] = [
           date: Calendar.current.date(byAdding: .day, value: -8, to: .now)!,
           isRead: true,
           isFlagged: true,
-          content: "Dear Patient,\n\nYour digital NHS health check is due by 28 August 2025. This is a free check-up of your health.\n\nPlease complete your health check as soon as possible.\n\nBest regards,\nWealden Ridge Surgery")
+          content: "Dear Patient,\n\nYour digital NHS health check is due by 28 August 2025. This is a free check-up of your health.\n\nPlease complete your health check as soon as possible.\n\nBest regards,\nWealden Ridge Surgery"),
+    
+        .init(sender: "Range Surgery",
+              preview: "Your annual flu vaccination is now due. Protect yourself this winter by booking your appointment today.",
+              date: Calendar.current.date(byAdding: .day, value: -2, to: .now)!,
+              isRead: false,
+              content: "Dear Patient,\n\nYour annual flu vaccination is now due. Protect yourself and others this winter by booking your appointment today.\n\nYou can book via the NHS App or contact Range Surgery directly.\n\nThank you,\nRange Surgery"),
+
+        .init(sender: "Range Surgery",
+              preview: "We noticed you haven’t completed your blood pressure check. Please submit your latest reading using our online form.",
+              date: Calendar.current.date(byAdding: .day, value: -4, to: .now)!,
+              isRead: true,
+              content: "Dear Patient,\n\nWe noticed you haven’t completed your blood pressure check yet.\n\nPlease submit your latest reading using our online form or by visiting the practice.\n\nRegular monitoring helps us keep your care up to date.\n\nKind regards,\nRange Surgery"),
+
+        .init(sender: "NHS Digital",
+              preview: "Important update: Changes to how your health information is stored and shared. Please review the new data sharing policy.",
+              date: Calendar.current.date(byAdding: .day, value: -9, to: .now)!,
+              isRead: true,
+              isFlagged: true,
+              content: "Dear Patient,\n\nWe’ve made important updates to how your health information is securely stored and shared within the NHS.\n\nPlease review the new data sharing policy in the NHS App or visit the NHS Digital website for details.\n\nThank you,\nNHS Digital"),
+
+        .init(sender: "Riverside Surgery",
+              preview: "Appointment reminder: You have a blood test booked for Monday 21 October at 9:15 AM.",
+              date: Calendar.current.date(byAdding: .hour, value: -10, to: .now)!,
+              isRead: false,
+              content: "Dear Mary,\n\nThis is a reminder that you have a blood test appointment at Riverside Surgery on **Monday 21 October at 9:15 AM**.\n\nPlease arrive 5 minutes early and bring a form of identification.\n\nIf you need to reschedule, contact the surgery as soon as possible.\n\nKind regards,\nRiverside Surgery")
+
 ]
 
 // MARK: Message row
@@ -393,6 +419,50 @@ struct MessagesView: View {
     @EnvironmentObject var messageStore: MessageStore
     @State private var selectedMessage: Message?
 
+    // MARK: Filter
+    enum Filter: String, CaseIterable, Identifiable {
+        case all = "All"
+        case unread = "Unread"
+        case flagged = "Flagged"
+        var id: Self { self }
+    }
+    @State private var filter: Filter = .all
+
+    // NEW: Search
+    @State private var searchText: String = ""
+
+    // Base filtered list (existing)
+    private var filteredMessages: [Message] {
+        let baseList: [Message]
+        switch filter {
+        case .all:
+            baseList = messageStore.messages
+        case .unread:
+            baseList = messageStore.messages.filter { !$0.isRead }
+        case .flagged:
+            baseList = messageStore.messages.filter { $0.isFlagged }
+        }
+
+        // Sort newest first (assuming Message has a `date` property)
+        return baseList.sorted { $0.date > $1.date }
+    }
+
+    // NEW: Apply search on top of the filter
+    private var displayedMessages: [Message] {
+        guard !searchText.isEmpty else { return filteredMessages }
+        return filteredMessages.filter { msg in
+            let q = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !q.isEmpty else { return true }
+            return msg.sender.localizedCaseInsensitiveContains(q)
+                || msg.preview.localizedCaseInsensitiveContains(q)
+                || msg.content.localizedCaseInsensitiveContains(q)
+        }
+    }
+
+    // Counts (existing)
+    private var unreadCount: Int { messageStore.messages.filter { !$0.isRead }.count }
+    private var flaggedCount: Int { messageStore.messages.filter { $0.isFlagged }.count }
+
     var body: some View {
         NavigationStack {
             if messageStore.messages.isEmpty {
@@ -404,9 +474,29 @@ struct MessagesView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.pageBackground)
                 .navigationTitle("Messages")
+                .navigationBarTitleDisplayMode(.large) // ensures large title
+                .toolbar { filterToolbar }
+                .searchable( // NEW: shows below the title (large nav bar)
+                    text: $searchText,
+                    placement: .navigationBarDrawer(displayMode: .always),
+                    prompt: "Search messages"
+                )
             } else {
                 List {
-                    ForEach(messageStore.messages) { message in
+                    // Empty state for current filter + search
+                    if displayedMessages.isEmpty {
+                        Section {
+                            Text(emptyStateText)
+                                .foregroundStyle(.textSecondary)
+                                .accessibilityAddTraits(.isStaticText)
+                        } header: {
+                            Text("Messages")
+                                .accessibilityAddTraits(.isHeader)
+                        }
+                        .rowStyle(.grey)
+                    }
+
+                    ForEach(displayedMessages) { message in
                         MessageRow(message: message)
                             .contentShape(Rectangle())
                             .onTapGesture {
@@ -452,8 +542,8 @@ struct MessagesView: View {
                             }
                     }
                     .rowStyle(.grey)
-                    
-                    // Removed messages link
+
+                    // Removed messages link (unchanged)
                     if !messageStore.removedMessages.isEmpty {
                         NavigationLink {
                             RemovedMessagesView()
@@ -472,14 +562,54 @@ struct MessagesView: View {
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
                 .navigationTitle("Messages")
+                .navigationBarTitleDisplayMode(.large) // NEW: keeps search under title
                 .background(Color.pageBackground)
                 .navigationDestination(item: $selectedMessage) { message in
                     MessageDetailView(message: message)
                 }
+                .toolbar { filterToolbar }
+                .searchable( // NEW
+                    text: $searchText,
+                    placement: .navigationBarDrawer(displayMode: .always),
+                    prompt: "Search messages"
+                )
+                .textInputAutocapitalization(.never)
+                .disableAutocorrection(true)
+                .animation(.default, value: filter)
+                .animation(.default, value: searchText)
             }
         }
     }
+
+    // Friendly empty state text reflecting search + filter
+    private var emptyStateText: String {
+        if searchText.isEmpty {
+            return "No \(filter.rawValue.lowercased()) messages"
+        } else {
+            return "No results for “\(searchText)” in \(filter.rawValue.lowercased())"
+        }
+    }
+
+    // MARK: Toolbar
+    @ToolbarContentBuilder
+    private var filterToolbar: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            Menu {
+                Picker("Filter", selection: $filter) {
+                    Text("All").tag(Filter.all)
+                    Text("Unread (\(unreadCount))").tag(Filter.unread)
+                    Text("Flagged (\(flaggedCount))").tag(Filter.flagged)
+                }
+            } label: {
+                Image(systemName: "line.3.horizontal.decrease")
+            }
+            .accessibilityLabel("Filter messages")
+            .accessibilityValue(filter.rawValue)
+            .accessibilityHint("Opens menu to change which messages are shown")
+        }
+    }
 }
+
 
 #Preview {
     MessagesView()
