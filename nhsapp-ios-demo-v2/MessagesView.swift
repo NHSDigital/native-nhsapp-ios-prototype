@@ -479,14 +479,45 @@ struct MessagesView: View {
     var body: some View {
         NavigationStack {
             if messageStore.messages.isEmpty {
-                VStack(spacing: 8) {
-                    Text("You have no messages.")
-                        .font(.body)
-                        .foregroundStyle(.textSecondary)
+                
+                List {
+                    // Removed messages link (unchanged)
+                    if !messageStore.removedMessages.isEmpty {
+                        NavigationLink {
+                            RemovedMessagesView()
+                        } label: {
+                            HStack {
+                                Text("Removed messages")
+                                    .foregroundStyle(.textSecondary)
+                                    .font(.subheadline)
+                                Spacer()
+                                Text("\(messageStore.removedMessages.count)")
+                                    .foregroundStyle(.textSecondary)
+                                    .font(.subheadline)
+                            }
+                        }
+                        .rowStyle(.grey)
+                        .listRowInsets(EdgeInsets(top: 11, leading: 16, bottom: 11, trailing: 16))
+                    }
+                    
+                    Section {
+                        Text("You have no messages.")
+                            .font(.subheadline)
+                            .foregroundStyle(.textSecondary)
+                            .rowStyle(.grey)
+                    }
+                    .listRowInsets(EdgeInsets(top: 11, leading: 16, bottom: 11, trailing: 16))
+                    .listSectionSeparator(.hidden)
                 }
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.pageBackground)
                 .navigationTitle("Messages")
+                .navigationSubtitle(
+                    Text(unreadSubtitle)
+                        .font(.title2)
+                )
                 .navigationBarTitleDisplayMode(.large) // ensures large title
                 .toolbar { filterToolbar }
                 .searchable( // NEW: shows below the title (large nav bar)
@@ -503,6 +534,25 @@ struct MessagesView: View {
                             .accessibilityAddTraits(.isStaticText)
                             .listRowSeparator(.hidden)
                             .rowStyle(.grey)
+                    }
+                    
+                    // Removed messages link (unchanged)
+                    if !messageStore.removedMessages.isEmpty {
+                        NavigationLink {
+                            RemovedMessagesView()
+                        } label: {
+                            HStack {
+                                Text("Removed messages")
+                                    .foregroundStyle(.textSecondary)
+                                    .font(.subheadline)
+                                Spacer()
+                                Text("\(messageStore.removedMessages.count)")
+                                    .foregroundStyle(.textSecondary)
+                                    .font(.subheadline)
+                            }
+                        }
+                        .rowStyle(.grey)
+                        .listRowInsets(EdgeInsets(top: 11, leading: 16, bottom: 11, trailing: 16))
                     }
 
                     ForEach(displayedMessages) { message in
@@ -552,21 +602,6 @@ struct MessagesView: View {
                     }
                     .rowStyle(.grey)
 
-                    // Removed messages link (unchanged)
-                    if !messageStore.removedMessages.isEmpty {
-                        NavigationLink {
-                            RemovedMessagesView()
-                        } label: {
-                            HStack {
-                                Text("Removed messages")
-                                Spacer()
-                                Text("\(messageStore.removedMessages.count)")
-                                    .foregroundStyle(.textSecondary)
-                            }
-                        }
-                        .rowStyle(.grey)
-                        .listRowInsets(EdgeInsets(top: 11, leading: 36, bottom: 11, trailing: 16))
-                    }
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
