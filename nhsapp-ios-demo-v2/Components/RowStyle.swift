@@ -6,6 +6,7 @@ struct RowStyle: ViewModifier {
         case paleBlue
         case grey
         case blue
+        case palePurple
     }
 
     var variant: Variant
@@ -32,6 +33,12 @@ struct RowStyle: ViewModifier {
             content
                 .listRowBackground(Color("NHSBlue"))
                 .listRowSeparatorTint(Color("NHSBlue").opacity(0.2))
+            
+        case .palePurple:
+            content
+                .foregroundStyle(Color("NHSAppDarkPurple"))
+                .listRowBackground(Color("NHSAppPalePurple"))
+                .listRowSeparatorTint(Color("NHSAppDarkPurple").opacity(0.2))
         }
     }
 }
