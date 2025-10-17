@@ -231,20 +231,11 @@ private struct MessageDetailView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 12) {
 
-                    HStack(alignment: .firstTextBaseline, spacing: 4) {
-                        Text(messageDetailDateString(for: message.date))
-                            .font(.subheadline)
-                            .foregroundStyle(.textSecondary)
-                        
-                        Spacer()
-
-                        if currentMessage.isFlagged {
-                            Image(systemName: "flag.fill")
-                                .imageScale(.small)
-                                .foregroundStyle(.warning)
-                        }
+                    if currentMessage.isFlagged {
+                        Image(systemName: "flag.fill")
+                            .imageScale(.small)
+                            .foregroundStyle(.warning)
                     }
-                    
 
                     Text(message.content.isEmpty ? message.preview : message.content)
                         .padding(.top, 16)
@@ -258,6 +249,7 @@ private struct MessageDetailView: View {
             .scrollIndicators(.hidden)
         }
         .navigationTitle(message.sender)
+        .navigationSubtitle(messageDetailDateString(for: message.date))
         .toolbar {
             ToolbarItem {
                 Button {
@@ -606,15 +598,12 @@ struct MessagesView: View {
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
                 .navigationTitle("Messages")
-                .navigationSubtitle(
-                    Text(unreadSubtitle)
-                        .font(.title2)
-                )
-                .navigationBarTitleDisplayMode(.large) // NEW: keeps search under title
+                .navigationSubtitle(unreadSubtitle)
                 .background(Color.pageBackground)
                 .navigationDestination(item: $selectedMessage) { message in
                     MessageDetailView(message: message)
                 }
+                .navigationBarTitleDisplayMode(.inline)
                 .toolbar { filterToolbar }
                 .searchable( // NEW
                     text: $searchText,
