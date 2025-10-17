@@ -33,7 +33,7 @@ struct HomeView: View {
                                 .scaledToFit()
                                 .frame(height: 28)
                                 .accessibilityLabel("NHS")
-                                .padding(.bottom, 16)
+                                .padding(.bottom, 12)
                             
                             Text("David Hunter")
                                 .font(.title)
@@ -51,29 +51,35 @@ struct HomeView: View {
                         Button(action: {
                             print("Change user tapped")
                         }) {
-                            Text("Change profile")
-                                .font(.subheadline)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 6)
-                                .background(Color("NHSAppDarkBlue").opacity(0.6))
-                                .foregroundColor(.textInverse)
-                                .clipShape(Capsule())
+                            HStack(spacing: 6) {
+                                Image(systemName: "arrow.triangle.2.circlepath")
+                                    .font(.system(size: 12)) // smaller icon
+                                Text("Change profile")
+                                    .font(.subheadline)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color("NHSAppDarkBlue").opacity(0.6))
+                            .foregroundColor(.textInverse)
+                            .clipShape(Capsule())
                         }
                         
                         Button(action: {
                             print("Add user tapped")
                         }) {
-                            Text("Add someone")
-                                .font(.subheadline)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 6)
-                                .background(Color("NHSAppDarkBlue").opacity(0.6))
-                                .foregroundColor(.textInverse)
-                                .clipShape(Capsule())
+                            HStack(spacing: 6) {
+                                Image(systemName: "person.crop.circle.badge.plus")
+                                    .font(.system(size: 12)) // smaller icon
+                                Text("Add person")
+                                    .font(.subheadline)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color("NHSAppDarkBlue").opacity(0.6))
+                            .foregroundColor(.textInverse)
+                            .clipShape(Capsule())
                         }
                     }
-                    .padding(.bottom, 4)
-    
                 }
                 .rowStyle(.blue)
                 
