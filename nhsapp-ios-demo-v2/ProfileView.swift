@@ -10,7 +10,7 @@ struct ProfileView: View {
                     HStack(alignment: .center) {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("David Hunter")
-                                .font(.title)
+                                .font(.title2)
                                 .bold()
                             Text("Date of birth: 15 March 1984")
                                 .font(.subheadline)
@@ -65,6 +65,7 @@ struct ProfileView: View {
 
             }
             .navigationTitle("Profile")
+            .navigationBarTitleDisplayMode(.inline)
             .nhsListStyle()
         }
         .background(Color.pageBackground)

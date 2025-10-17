@@ -6,6 +6,8 @@ extension Color {
     static let text             = Color("NHSBlack")
     static let textSecondary    = Color("NHSGrey1")
     static let textTertiary     = Color("NHSGrey3")
+    static let textInverse     = Color("NHSWhite")
+    static let textInverseOnly     = Color("NHSWhiteOnly")
     static let destructive      = Color("NHSRed")
     static let warning          = Color("NHSOrange")
     static let primary         = Color("AccentColor")
@@ -18,6 +20,8 @@ extension ShapeStyle where Self == Color {
     static var text: Color            { .text }
     static var textSecondary: Color   { .textSecondary }
     static var textTertiary: Color    { .textTertiary }
+    static var textInverse: Color     { .textInverse }
+    static var textInverseOnly: Color     { .textInverseOnly }
     static var destructive: Color     { .destructive }
     static var warning: Color         { .warning }
     static var primary: Color         { .primary}

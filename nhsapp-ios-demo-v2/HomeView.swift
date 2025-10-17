@@ -18,6 +18,59 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             List {
+                
+                // Custom row with title, subtitle and a navigation link
+                Section {
+                    HStack(alignment: .center) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Image("nhs_logo")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 28)
+                                .accessibilityLabel("NHS")
+                                .padding(.bottom, 16)
+                            Text("David Hunter")
+                                .font(.title)
+                                .bold()
+                                .foregroundColor(.textInverseOnly)
+                            Text("\(Text("NHS number: ").bold())123 456 789")
+                                .font(.subheadline)
+                                .foregroundColor(.textInverseOnly)
+                        }
+                    }
+                    .padding(.top, 8)
+                    
+                    HStack(spacing: 12) {
+                            Button(action: {
+                                // Action for changing user
+                                print("Change user tapped")
+                            }) {
+                                Text("Change profile")
+                                    .font(.subheadline)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 6)
+                                    .background(Color("NHSAppDarkBlue").opacity(0.6))
+                                    .foregroundColor(.textInverse)
+                                    .clipShape(Capsule())
+                            }
+                            
+                            Button(action: {
+                                // Action for adding user
+                                print("Add user tapped")
+                            }) {
+                                Text("Add someone")
+                                    .font(.subheadline)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 6)
+                                    .background(Color("NHSAppDarkBlue").opacity(0.6))
+                                    .foregroundColor(.textInverse)
+                                    .clipShape(Capsule())
+                            }
+                        }
+                        .padding(.bottom, 4)
+    
+                }
+                .rowStyle(.blue)
 
                 // Navigation links
                 Section {
@@ -55,7 +108,6 @@ struct HomeView: View {
                 SafariView(url: link.url)
                     .ignoresSafeArea()
             }
-            .navigationTitle("Home")
             .nhsListStyle()
         }
         .background(Color.pageBackground)
