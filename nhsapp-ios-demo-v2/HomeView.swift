@@ -18,11 +18,7 @@ struct HomeView: View {
     // Start hidden so we can animate it in after a delay
     @State private var showPrescriptionCard = false
     
-    // Persist dismissal across app launches
-    @AppStorage("hidePrescriptionCard") private var hidePrescriptionCard = false
-
-    // Prevent re-scheduling the intro animation repeatedly in the same session
-    @State private var didScheduleIntro = false
+    @State private var showAppointmentCard = false
 
     var body: some View {
         NavigationStack {
@@ -81,11 +77,11 @@ struct HomeView: View {
                 }
                 .rowStyle(.blue)
                 
-                // Prescription card (only if not permanently hidden)
-                if !hidePrescriptionCard && showPrescriptionCard {
+                // Prescription card (no persistence; shows after delay on each appearance)
+                if showPrescriptionCard {
                     Section {
                         ZStack(alignment: .topTrailing) {
-
+                                
                             HStack(alignment: .center) {
                                 VStack(alignment: .leading, spacing: 8) {
                                     Text("Ready to collect")
@@ -98,10 +94,7 @@ struct HomeView: View {
 
                             Button {
                                 withAnimation(.easeInOut) {
-                                    // Hide now (animates out)...
                                     showPrescriptionCard = false
-                                    // ...and remember to never show it again
-                                    hidePrescriptionCard = true
                                 }
                             } label: {
                                 Image(systemName: "xmark.circle.fill")
@@ -109,6 +102,7 @@ struct HomeView: View {
                                     .foregroundColor(Color("NHSAppDarkPurple"))
                                     .accessibilityLabel("Dismiss prescription card")
                             }
+                            
                         }
                         RowLink(title: "View prescription", chevronColor: Color("NHSAppDarkPurple").opacity(0.7)) { }
                     }
@@ -116,39 +110,95 @@ struct HomeView: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
                 
-                // Appointment card (example)
-                Section {
-                    RowLink(chevronColor: Color("NHSAppDarkAquaGreen")) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Upcoming appointment")
-                                .bold()
-                                .padding(.bottom, 4)
-                            Text("Tuesday, 15 November 2025")
-                                .font(.subheadline)
-                            Text("3:15pm")
-                                .font(.subheadline)
-                                .padding(.bottom, 8)
-                            Text("Dr Conor Murphy")
-                                .font(.subheadline)
-                            Text("Menston Medical Centre")
-                                .font(.subheadline)
-                        }
-                        .padding(.vertical, 4)
-                    } destination: { }
+                if showAppointmentCard {
+                    // Appointment card (example)
+                    Section {
+                        RowLink {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Upcoming appointment")
+                                    .bold()
+                                    .padding(.bottom, 4)
+                                Text("Tuesday, 15 November 2025")
+                                    .font(.subheadline)
+                                Text("3:15pm")
+                                    .font(.subheadline)
+                                    .padding(.bottom, 8)
+                                Text("Dr Conor Murphy")
+                                    .font(.subheadline)
+                                Text("Menston Medical Centre")
+                                    .font(.subheadline)
+                            }
+                            .padding(.vertical, 4)
+                        } destination: { }
+                    }
+                    .rowStyle(.white)
                 }
-                .rowStyle(.paleAquaGreen)
                 
 
                 // Navigation links
                 Section {
-                    RowLink(title: "Prescriptions") { }
-                    RowLink(title: "Appointments") { }
-                    RowLink(title: "Test results") { }
-                    RowLink(title: "Vaccinations") { }
-                    RowLink(title: "Health conditions") { }
-                    RowLink(title: "Documents") { }
+                    RowLink {
+                        Label {
+                            Text("Prescriptions")
+                                .foregroundColor(.text)
+                        } icon: {
+                            Image(systemName: "pills.fill")
+                                .foregroundColor(.accentColor)
+                        }
+                    } destination: { }
+
+                    RowLink {
+                        Label {
+                            Text("Appointments")
+                                .foregroundColor(.text)
+                        } icon: {
+                            Image(systemName: "calendar.badge.clock")
+                                .foregroundColor(.accentColor)
+                        }
+                    } destination: { }
+
+                    RowLink {
+                        Label {
+                            Text("Test results")
+                                .foregroundColor(.text)
+                        } icon: {
+                            Image(systemName: "waveform.path.ecg")
+                                .foregroundColor(.accentColor)
+                        }
+                    } destination: { }
+
+                    RowLink {
+                        Label {
+                            Text("Vaccinations")
+                                .foregroundColor(.text)
+                        } icon: {
+                            Image(systemName: "syringe")
+                                .foregroundColor(.accentColor)
+                        }
+                    } destination: { }
+
+                    RowLink {
+                        Label {
+                            Text("Health conditions")
+                                .foregroundColor(.text)
+                        } icon: {
+                            Image(systemName: "cross.case.fill")
+                                .foregroundColor(.accentColor)
+                        }
+                    } destination: { }
+
+                    RowLink {
+                        Label {
+                            Text("Documents")
+                                .foregroundColor(.text)
+                        } icon: {
+                            Image(systemName: "doc.text.fill")
+                                .foregroundColor(.accentColor)
+                        }
+                    } destination: { }
                 }
                 .rowStyle(.white)
+
 
                 // External link rows (multiple)
                 Section {
@@ -175,21 +225,10 @@ struct HomeView: View {
                     .ignoresSafeArea()
             }
             .nhsListStyle()
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("App help") {
-                        print("App help tapped")
-                    }
-                }
-            }
         }
         .background(Color.pageBackground)
         .onAppear {
-            // Only schedule the intro animation if:
-            // 1) The card isn’t permanently hidden, and
-            // 2) We haven’t scheduled it already in this session.
-            guard !hidePrescriptionCard, !didScheduleIntro else { return }
-            didScheduleIntro = true
+            // Re-schedule every time HomeView appears
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 withAnimation(.easeInOut(duration: 0.5)) {
                     showPrescriptionCard = true
