@@ -54,14 +54,16 @@ struct HomeView: View {
                         }) {
                             HStack(spacing: 6) {
                                 Image(systemName: "arrow.triangle.2.circlepath")
-                                    .font(.system(size: 12)) // smaller icon
+                                    .font(.system(size: 14)) // smaller icon
+                                    .bold()
                                 Text("Change profile")
                                     .font(.subheadline)
+                                    .bold()
                             }
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
-                            .background(Color("NHSAppDarkBlue").opacity(0.6))
-                            .foregroundColor(.textInverse)
+                            .background(Color("NHSAppDarkBlueOnly").opacity(0.6))
+                            .foregroundColor(.textInverseOnly)
                             .clipShape(Capsule())
                         }
                         
@@ -70,14 +72,16 @@ struct HomeView: View {
                         }) {
                             HStack(spacing: 6) {
                                 Image(systemName: "person.crop.circle.badge.plus")
-                                    .font(.system(size: 12)) // smaller icon
+                                    .font(.system(size: 14)) // smaller icon
+                                    .bold()
                                 Text("Add person")
                                     .font(.subheadline)
+                                    .bold()
                             }
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
-                            .background(Color("NHSAppDarkBlue").opacity(0.6))
-                            .foregroundColor(.textInverse)
+                            .background(Color("NHSAppDarkBlueOnly").opacity(0.6))
+                            .foregroundColor(.textInverseOnly)
                             .clipShape(Capsule())
                         }
                     }
