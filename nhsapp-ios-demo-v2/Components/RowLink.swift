@@ -36,6 +36,7 @@ struct RowLink<Label: View, Destination: View>: View {
             Image(systemName: "chevron.right")
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(chevronColor.opacity(0.7))
+                .accessibilityHidden(true)
         }
         .contentShape(Rectangle())
         .onTapGesture { isPresented = true }

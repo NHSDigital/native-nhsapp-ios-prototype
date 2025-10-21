@@ -10,6 +10,8 @@ struct HomeView: View {
     }
 
     @State private var selectedLink: LinkItem? = nil
+    
+    @AccessibilityFocusState private var isSafariFocused: Bool
 
     // State variables for toggle examples
     @State private var toggleOne = true
@@ -56,6 +58,7 @@ struct HomeView: View {
                                 Image(systemName: "arrow.triangle.2.circlepath")
                                     .font(.system(size: 14)) // smaller icon
                                     .bold()
+                                    .accessibilityHidden(true)
                                 Text("Change profile")
                                     .font(.subheadline)
                                     .bold()
@@ -74,6 +77,7 @@ struct HomeView: View {
                                 Image(systemName: "person.crop.circle.badge.plus")
                                     .font(.system(size: 14)) // smaller icon
                                     .bold()
+                                    .accessibilityHidden(true)
                                 Text("Add person")
                                     .font(.subheadline)
                                     .bold()
@@ -113,6 +117,8 @@ struct HomeView: View {
                                     .foregroundColor(Color("NHSAppDarkPurple"))
                                     .accessibilityLabel("Dismiss prescription card")
                             }
+                            .accessibilityLabel("Dismiss prescription card")
+                            .accessibilityHint("Hides the ‘Ready to collect’ message.")
                             
                         }
                         RowLink(title: "View prescription", chevronColor: Color("NHSAppDarkPurple").opacity(0.7)) { }
@@ -258,8 +264,10 @@ struct HomeView: View {
 
             }
             .fullScreenCover(item: $selectedLink) { link in
-                SafariView(url: link.url)
-                    .ignoresSafeArea()
+              SafariView(url: link.url)
+                .ignoresSafeArea()
+                .accessibilityFocused($isSafariFocused)
+                .onAppear { isSafariFocused = true }
             }
             .nhsListStyle()
         }
