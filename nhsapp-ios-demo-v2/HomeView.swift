@@ -20,7 +20,7 @@ struct HomeView: View {
     // Start hidden so we can animate it in after a delay
     @State private var showPrescriptionCard = false
     
-    @State private var showAppointmentCard = false
+    @State private var showAppointmentCard = true
 
     var body: some View {
         NavigationStack {
@@ -121,7 +121,7 @@ struct HomeView: View {
                             .accessibilityHint("Hides the ‘Ready to collect’ message.")
                             
                         }
-                        RowLink(title: "View prescription", chevronColor: Color("NHSAppDarkPurple").opacity(0.7)) { }
+                        RowLink(title: "View prescription", chevronColor: Color("NHSAppDarkPurple").opacity(0.7)) { DetailView(index: 0) }
                     }
                     .rowStyle(.palePurple)
                     .transition(.move(edge: .top).combined(with: .opacity))
@@ -142,15 +142,13 @@ struct HomeView: View {
                                     .padding(.bottom, 8)
                                 Text("Dr Conor Murphy")
                                     .font(.subheadline)
-                                    .foregroundColor(.textSecondary)
                                 Text("Menston Medical Centre")
                                     .font(.subheadline)
-                                    .foregroundColor(.textSecondary)
                             }
                             .padding(.vertical, 4)
-                        } destination: { }
+                        } destination: { DetailView(index: 0) }
                     }
-                    .rowStyle(.white)
+                    .rowStyle(.paleBlue)
                 }
                 
 
@@ -168,7 +166,7 @@ struct HomeView: View {
                                 .background(Color("NHSAppPalePurple"))
                                 .clipShape(Circle())
                         }
-                    } destination: { }
+                    } destination: { PrescriptionsView() }
 
                     RowLink {
                         Label {
@@ -182,7 +180,7 @@ struct HomeView: View {
                                 .background(Color("NHSAppPaleBlue"))
                                 .clipShape(Circle())
                         }
-                    } destination: { }
+                    } destination: { DetailView(index: 0) }
 
                     RowLink {
                         Label {
@@ -196,7 +194,7 @@ struct HomeView: View {
                                 .background(Color("NHSAppPalePink"))
                                 .clipShape(Circle())
                         }
-                    } destination: { }
+                    } destination: { DetailView(index: 0) }
 
                     RowLink {
                         Label {
@@ -210,7 +208,7 @@ struct HomeView: View {
                                 .background(Color("NHSAppPaleOrange"))
                                 .clipShape(Circle())
                         }
-                    } destination: { }
+                    } destination: { DetailView(index: 0) }
 
                     RowLink {
                         Label {
@@ -224,7 +222,7 @@ struct HomeView: View {
                                 .background(Color("NHSAppPaleAquaGreen"))
                                 .clipShape(Circle())
                         }
-                    } destination: { }
+                    } destination: { DetailView(index: 0) }
 
                     RowLink {
                         Label {
@@ -238,7 +236,7 @@ struct HomeView: View {
                                 .background(Color("NHSAppPaleRed"))
                                 .clipShape(Circle())
                         }
-                    } destination: { }
+                    } destination: { DetailView(index: 0) }
                 }
                 .rowStyle(.white)
 

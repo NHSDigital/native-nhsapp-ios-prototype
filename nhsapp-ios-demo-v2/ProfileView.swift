@@ -28,28 +28,28 @@ struct ProfileView: View {
                 .rowStyle(.paleBlue)
                 
                 Section {
-                    RowLink(title: "Contact details") { }
-                    RowLink(title: "Your GP surgery") { }
-                    RowLink(title: "Health choices") { }
-                    RowLink(title: "Care plans") { }
+                    RowLink(title: "Contact details") { DetailView(index: 0) }
+                    RowLink(title: "Your GP surgery") { DetailView(index: 0) }
+                    RowLink(title: "Health choices") { DetailView(index: 0) }
+                    RowLink(title: "Care plans") { DetailView(index: 0) }
                 } header: {
                     Text("Personal details")
                 }
                 .rowStyle(.white)
                 
                 Section {
-                    RowLink(title: "Face ID") { }
-                    RowLink(title: "Login and security") { }
-                    RowLink(title: "Notifications") { }
-                    RowLink(title: "Cookies") { }
+                    RowLink(title: "Face ID") { DetailView(index: 0) }
+                    RowLink(title: "Login and security") { DetailView(index: 0) }
+                    RowLink(title: "Notifications") { DetailView(index: 0) }
+                    RowLink(title: "Cookies") { DetailView(index: 0) }
                 } header: {
                     Text("App settings")
                 }
                 .rowStyle(.white)
                 
                 Section {
-                    RowLink(title: "Privacy and legal policies") { }
-                    RowLink(title: "Join our research panel") { }
+                    RowLink(title: "Privacy and legal policies") { DetailView(index: 0) }
+                    RowLink(title: "Join our research panel") { DetailView(index: 0) }
                 } header: {
                     Text("About the NHS App")
                 }
@@ -65,6 +65,7 @@ struct ProfileView: View {
 
             }
             .navigationTitle("Profile")
+            .navigationBarTitleDisplayMode(.large)
             .nhsListStyle()
         }
         .background(Color.pageBackground)
