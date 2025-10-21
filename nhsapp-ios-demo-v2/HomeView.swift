@@ -136,8 +136,10 @@ struct HomeView: View {
                                     .padding(.bottom, 8)
                                 Text("Dr Conor Murphy")
                                     .font(.subheadline)
+                                    .foregroundColor(.textSecondary)
                                 Text("Menston Medical Centre")
                                     .font(.subheadline)
+                                    .foregroundColor(.textSecondary)
                             }
                             .padding(.vertical, 4)
                         } destination: { }
@@ -154,7 +156,11 @@ struct HomeView: View {
                                 .foregroundColor(.text)
                         } icon: {
                             Image(systemName: "pills.fill")
-                                .foregroundColor(.accentColor)
+                                .font(.system(size: 12))
+                                .foregroundColor(Color("NHSPurple"))
+                                .padding(8)
+                                .background(Color("NHSAppPalePurple"))
+                                .clipShape(Circle())
                         }
                     } destination: { }
 
@@ -164,7 +170,11 @@ struct HomeView: View {
                                 .foregroundColor(.text)
                         } icon: {
                             Image(systemName: "calendar.badge.clock")
+                                .font(.system(size: 12))
                                 .foregroundColor(.accentColor)
+                                .padding(8)
+                                .background(Color("NHSAppPaleBlue"))
+                                .clipShape(Circle())
                         }
                     } destination: { }
 
@@ -174,7 +184,11 @@ struct HomeView: View {
                                 .foregroundColor(.text)
                         } icon: {
                             Image(systemName: "waveform.path.ecg")
-                                .foregroundColor(.accentColor)
+                                .font(.system(size: 12))
+                                .foregroundColor(Color("NHSPink"))
+                                .padding(8)
+                                .background(Color("NHSAppPalePink"))
+                                .clipShape(Circle())
                         }
                     } destination: { }
 
@@ -184,7 +198,11 @@ struct HomeView: View {
                                 .foregroundColor(.text)
                         } icon: {
                             Image(systemName: "syringe")
-                                .foregroundColor(.accentColor)
+                                .font(.system(size: 12))
+                                .foregroundColor(Color("NHSOrange"))
+                                .padding(8)
+                                .background(Color("NHSAppPaleOrange"))
+                                .clipShape(Circle())
                         }
                     } destination: { }
 
@@ -194,7 +212,11 @@ struct HomeView: View {
                                 .foregroundColor(.text)
                         } icon: {
                             Image(systemName: "cross.case.fill")
-                                .foregroundColor(.accentColor)
+                                .font(.system(size: 12))
+                                .foregroundColor(Color("NHSAquaGreen"))
+                                .padding(8)
+                                .background(Color("NHSAppPaleAquaGreen"))
+                                .clipShape(Circle())
                         }
                     } destination: { }
 
@@ -204,7 +226,11 @@ struct HomeView: View {
                                 .foregroundColor(.text)
                         } icon: {
                             Image(systemName: "doc.text.fill")
-                                .foregroundColor(.accentColor)
+                                .font(.system(size: 12))
+                                .foregroundColor(Color("NHSRed"))
+                                .padding(8)
+                                .background(Color("NHSAppPaleRed"))
+                                .clipShape(Circle())
                         }
                     } destination: { }
                 }
