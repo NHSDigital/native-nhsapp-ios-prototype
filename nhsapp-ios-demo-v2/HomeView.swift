@@ -180,7 +180,7 @@ struct HomeView: View {
                                 .background(Color("NHSAppPaleBlue"))
                                 .clipShape(Circle())
                         }
-                    } destination: { DetailView(index: 0) }
+                    } destination: { AppointmentsView() }
 
                     RowLink {
                         Label {
@@ -194,7 +194,7 @@ struct HomeView: View {
                                 .background(Color("NHSAppPalePink"))
                                 .clipShape(Circle())
                         }
-                    } destination: { DetailView(index: 0) }
+                    } destination: { TestResultsView() }
 
                     RowLink {
                         Label {
@@ -208,7 +208,7 @@ struct HomeView: View {
                                 .background(Color("NHSAppPaleOrange"))
                                 .clipShape(Circle())
                         }
-                    } destination: { DetailView(index: 0) }
+                    } destination: { VaccinationsView() }
 
                     RowLink {
                         Label {
@@ -222,7 +222,7 @@ struct HomeView: View {
                                 .background(Color("NHSAppPaleAquaGreen"))
                                 .clipShape(Circle())
                         }
-                    } destination: { DetailView(index: 0) }
+                    } destination: { HealthConditionsView() }
 
                     RowLink {
                         Label {
@@ -236,7 +236,7 @@ struct HomeView: View {
                                 .background(Color("NHSAppPaleRed"))
                                 .clipShape(Circle())
                         }
-                    } destination: { DetailView(index: 0) }
+                    } destination: { DocumentsView() }
                 }
                 .rowStyle(.white)
 

@@ -7,7 +7,7 @@ struct PrescriptionsView: View {
     var body: some View {
         List {
             
-            // Prescription card (no persistence; shows after delay on each appearance)
+            // Prescription card - dismissable
             if showPrescriptionCard {
                 Section {
                     ZStack(alignment: .topTrailing) {
@@ -47,7 +47,17 @@ struct PrescriptionsView: View {
                 RowLink(title: "Check the progress of prescriptions") { DetailView(index: 0) }
                 RowLink(title: "Medicines record") { DetailView(index: 0) }
                 RowLink(title: "Request an emergency prescription") { DetailView(index: 0) }
-                RowLink(title: "Your chosen pharmacy") { DetailView(index: 0) }
+                RowLink {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Your chosen pharmacy")
+                        Text("Wellcare Pharmacy")
+                            .font(.subheadline)
+                            .foregroundStyle(.textSecondary)
+                    }
+                    .padding(.vertical, 4)
+                } destination: {
+                    DetailView(index: 0)
+                }
             } header: {
                 Text("GP surgery")
             }

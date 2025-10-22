@@ -603,7 +603,7 @@ struct MessagesView: View {
                 .navigationDestination(item: $selectedMessage) { message in
                     MessageDetailView(message: message)
                 }
-                .navigationBarTitleDisplayMode(.inline)
+
                 .toolbar { filterToolbar }
                 .searchable( // NEW
                     text: $searchText,
