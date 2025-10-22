@@ -268,14 +268,6 @@ struct HomeView: View {
                             .resizable()
                             .scaledToFill()
                             .frame(height: 180) // adjust height as needed
-                            .clipShape(
-                                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            )
-                            .mask(
-                                // Only round top corners
-                                RoundedCorners(tl: 12, tr: 12, bl: 0, br: 0)
-                            )
-                            .clipped()
 
                         // --- Content ---
                         RowLink(chevronColor: Color("NHSAppPaleBlue"), horizontalPadding: 16) {
