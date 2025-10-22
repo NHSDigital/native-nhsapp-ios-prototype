@@ -5,6 +5,7 @@ struct AppFlowPreview: View {
 
     var body: some View {
         ZStack {
+            // Edit this to change the nav for the different versions
             MainTabView()
                 .opacity(showSplash ? 0 : 1)
 

@@ -16,6 +16,7 @@ struct NHSApp_iOS_Demo_v2App: App {
                     .ignoresSafeArea()
                     .transition(.opacity)
                 } else {
+                    // Edit this to change the nav for the different versions
                     MainTabView()
                         .transition(.opacity)
                 }

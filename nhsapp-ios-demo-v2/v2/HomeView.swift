@@ -262,39 +262,17 @@ struct HomeView: View {
                 
                 // Campaign card
                 Section {
-                    VStack(spacing: 0) {
-                        // --- Image ---
-                        Image("campaign_img")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(height: 180) // adjust height as needed
-
-                        // --- Content ---
-                        RowLink(chevronColor: Color("NHSAppPaleBlue"), horizontalPadding: 16) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Organ donors save lives")
-                                    .font(.title2)
-                                    .foregroundColor(Color("NHSWhite"))
-                                    .bold()
-                                    .padding(.bottom, 4)
-                                Text("Take two minutes to confirm your organ donation decision")
-                                    .font(.subheadline)
-                                    .foregroundColor(Color("NHSWhite"))
-                                    .padding(.bottom, 4)
-                            }
-                            .padding(.vertical, 16)
-                        } destination: {
-                            DetailView(index: 0)
-                        }
-                        .background(Color("NHSAppDarkBlue"))
+                    CampaignCard(
+                        imageName: "campaign_img",
+                        title: "Organ donors save lives",
+                        subtitle: "Take two minutes to confirm your organ donation decision",
+                        backgroundColor: Color("NHSAppDarkBlue"),
+                        chevronColor: Color("NHSAppPaleBlue")
+                    ) {
+                        DetailView(index: 0)
                     }
-                    .clipShape(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    )
-                    .shadow(radius: 2)
                 }
-                .listRowInsets(EdgeInsets()) // removes default padding around section
-                .listRowBackground(Color.clear) // ensures no unwanted background
+                .campaignCardRowStyle()
 
             }
             .fullScreenCover(item: $selectedLink) { link in
