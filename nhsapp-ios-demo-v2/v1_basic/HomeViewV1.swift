@@ -14,12 +14,12 @@ struct HomeViewV1: View {
             List {
                 
                 Section {
-                    NavigationLink("Prescriptions", destination: DetailView(index: 0))
-                    NavigationLink("Appointments", destination: DetailView(index: 0))
-                    NavigationLink("Test results", destination: DetailView(index: 0))
-                    NavigationLink("Vaccinations", destination: DetailView(index: 0))
-                    NavigationLink("Health conditions", destination: DetailView(index: 0))
-                    NavigationLink("Documents", destination: DetailView(index: 0))
+                    NavigationLink("Prescriptions", destination: PrescriptionsViewV1())
+                    NavigationLink("Appointments", destination: AppointmentsViewV1())
+                    NavigationLink("Test results", destination: TestResultsViewV1())
+                    NavigationLink("Vaccinations", destination: VaccinationsViewV1())
+                    NavigationLink("Health conditions", destination: HealthConditionsViewV1())
+                    NavigationLink("Documents", destination: DocumentsViewV1())
                 }
                 .rowStyle(.white)
 
