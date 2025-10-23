@@ -14,10 +14,11 @@ struct MessagesViewV1: View {
                 .rowStyle(.white)
 
             }
+            .nhsListStyle()
             .navigationTitle("Messages")
             .navigationBarTitleDisplayMode(.large)
-            .background(Color.pageBackground)
             .appHelpToolbar()
+            .background(Color.pageBackground)
         }
     }
 }
