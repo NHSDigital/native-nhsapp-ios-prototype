@@ -20,12 +20,12 @@ struct ProfileView: View {
                     }
                     .padding(.vertical, 4)
                     
-                    RowLink(title: "Manage health services for others", chevronColor: Color("NHSAppDarkBlue").opacity(0.7)) {
+                    RowLink(title: "Manage health services for others") {
                             DetailView(index: 6)
                         }
     
                 }
-                .rowStyle(.paleBlue)
+                .rowStyle(.white)
                 
                 Section {
                     RowLink(title: "Contact details") { DetailView(index: 0) }
