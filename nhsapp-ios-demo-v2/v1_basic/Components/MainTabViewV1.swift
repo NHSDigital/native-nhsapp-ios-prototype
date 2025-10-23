@@ -18,6 +18,7 @@ struct MainTabViewV1: View {
             MessagesViewV1()
                 .environmentObject(messageStore)
                 .tag(1)
+                // Badge for messages count
                 .badge(messageStore.unreadCount)
                 .tabItem {
                     Group {
