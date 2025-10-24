@@ -43,7 +43,11 @@ struct PrescriptionsView: View {
             }
 
             Section {
-                RowLink(title: "Request a repeat prescription") { DetailView(index: 0) }
+
+                RowLink(title: "Request a repeat prescription") {
+                    PrescriptionsRequestView()
+                }
+                
                 RowLink(title: "Check the progress of prescriptions") { DetailView(index: 0) }
                 RowLink(title: "Medicines record") { DetailView(index: 0) }
                 RowLink(title: "Request an emergency prescription") { DetailView(index: 0) }
