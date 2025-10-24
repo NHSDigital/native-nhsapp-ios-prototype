@@ -1,12 +1,28 @@
 import SwiftUI
 
 struct AppointmentsView: View {
+    @State private var showAppointmentsSheet = false
 
     var body: some View {
         List {
 
             Section {
-                RowLink(title: "Book an appointment") { DetailView(index: 0) }
+                // Custom row that looks like RowLink but opens a sheet
+                HStack {
+                    Text("Book an appointment")
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(Color.accentColor.opacity(0.7))
+                        .accessibilityHidden(true)
+                }
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    showAppointmentsSheet = true
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(.isButton)
+                
                 RowLink(title: "Manage GP appointments") { DetailView(index: 0) }
                 RowLink(title: "Appointment notes and other updates") { DetailView(index: 0) }
                 RowLink {
@@ -37,7 +53,22 @@ struct AppointmentsView: View {
         }
         .navigationTitle("Appointments")
         .navigationBarTitleDisplayMode(.large)
-        .nhsListStyle()
+        .sheet(isPresented: $showAppointmentsSheet) {
+            NavigationView {
+                AppointmentsBookStartView()
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button(action: {
+                                showAppointmentsSheet = false
+                            }) {
+                                Image(systemName: "xmark")
+                                    .imageScale(.large) // Adjust size if needed
+                                    .foregroundColor(.black) // Or use a custom colour
+                            }
+                        }
+                    }
+            }
+        }
     }
 }
 
