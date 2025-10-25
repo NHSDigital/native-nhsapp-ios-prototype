@@ -54,21 +54,9 @@ struct AppointmentsView: View {
         .navigationTitle("Appointments")
         .navigationBarTitleDisplayMode(.large)
         .sheet(isPresented: $showAppointmentsSheet) {
-            NavigationView {
-                AppointmentsBookStartView()
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarLeading) {
-                            Button(action: {
-                                showAppointmentsSheet = false
-                            }) {
-                                Image(systemName: "xmark")
-                                    .imageScale(.large) // Adjust size if needed
-                                    .foregroundColor(.black) // Or use a custom colour
-                            }
-                        }
-                    }
-            }
+            AppointmentsFlowRoot(isPresented: $showAppointmentsSheet)
         }
+
     }
 }
 
