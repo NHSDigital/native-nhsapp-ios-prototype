@@ -437,7 +437,7 @@ struct ProfileManagementSheet: View {
                         .bold()
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 20)
-                        .padding(.top, 20)
+                        .padding(.top, 28)
                         .padding(.bottom, 16)
                     
                     Text("Choose the profile you want to use from this list. If you can't find the item you want, go press a different button.")
@@ -507,13 +507,15 @@ struct ProfileManagementSheet: View {
                                 Circle()
                                     .stroke(Color.white.opacity(0.2), lineWidth: 1)
                             )
-                            .frame(width: 32, height: 32)
+                        
+                            .frame(width: 40, height: 40)
                         
                         Image(systemName: "xmark")
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundColor(.black)
                     }
                     .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
+                    
                 }
                 .padding(.top, 20)
                 .padding(.trailing, 20)
