@@ -158,13 +158,13 @@ struct BookingStep1View: View {
                         // Draw the line on the left
                         Rectangle()
                             .fill(Color.nhsBlue)
-                            .frame(width: 4)
+                            .frame(width: 8)
                         
                         // The text area
                         VStack(alignment: .leading, spacing: 16) {
                             
                             Text("A message from your GP surgery")
-                                .fontWeight(.bold)
+                                .font(.headline)
                             
                             Text("Blood tests are INVITE ONLY and should be booked with Nurse Donna at the Southbank Practice. Also book with Donna for warfarin clinic and b12 injections. Please remember to cancel your appointment if it is no longer needed. Thanks")
                                 .font(.body)
@@ -173,19 +173,23 @@ struct BookingStep1View: View {
                         
                     } // end of the inset text component
                     
+                    Divider()
+
+                    Text("For urgent medical advice, call 111 or visit 111.nhs.uk")
+                        .font(.body)
+                    
                     // Ghost button for 111 Online
-                    VStack(alignment: .leading, spacing: 16) {
-                        RowLink {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Visit 111 Online if you feel unwell")
-                                    .padding(.bottom, 4)
-                            }
-                            .padding(.vertical, 16)
-                        } destination: { DetailView(index: 0) }
-                        .padding(.horizontal, 20)
-                    }
+                    RowLink {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("111 Online")
+                                .padding(.bottom, 4)
+                        }
+                        .padding(.vertical, 16)
+                    } destination: { DetailView(index: 0) }
+                    .padding(.horizontal, 20)
                     .background(Color.clear)
-                    .overlay(RoundedRectangle(cornerRadius: 30).stroke(Color.nhsGrey4, lineWidth: 1))
+                    .overlay(RoundedRectangle(cornerRadius: 30).stroke(Color.nhsGrey4, lineWidth: 1)) 
+                    
                     
                 } // End of the content area
                 .padding()
