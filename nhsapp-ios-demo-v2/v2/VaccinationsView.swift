@@ -307,6 +307,6 @@ struct BookingStep3View: View {
 
 
 // MARK: - Preview
-#Preview {
-    VaccinationsView()
+#Preview() {
+    AppFlowPreview()
 }
