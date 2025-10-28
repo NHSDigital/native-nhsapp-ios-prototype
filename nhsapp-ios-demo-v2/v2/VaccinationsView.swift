@@ -36,121 +36,76 @@ struct VaccinationsView: View {
 
 
 
-// MARK: - Flow Coordinator
+// MARK: - Shared flow data
+@Observable
+class BookingFlowData {
+    var answer1: String = ""
+    var answer2: String = ""
+    var selectedDate: Date?
+    // Add any other data you need to share between steps
+}
+
+
+
+// MARK: - Flow coordinator
 struct BookingFlowCoordinator: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var currentStep: BookingStep = .initial
     @State private var navigationPath: [BookingStep] = []
-    @State private var isNavigatingForward = true
+    @State private var flowData = BookingFlowData()
     
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                // Content area with transitions
-                ZStack {
-                    stepView(for: currentStep)
-                        .id(currentStep.id)
-                        .transition(.asymmetric(
-                            insertion: .move(edge: isNavigatingForward ? .trailing : .leading),
-                            removal: .move(edge: isNavigatingForward ? .leading : .trailing)
-                        ))
+        NavigationStack(path: $navigationPath) {
+            BookingStep1View(
+                flowData: flowData,
+                onContinue: {
+                    navigationPath.append(.stepTwo(previousAnswer: flowData.answer1))
+                },
+                onDismiss: {
+                    dismiss()
                 }
-                
-                // Fixed bottom button (outside the transition)
-                VStack(spacing: 0) {
-                    Divider()
-                    Button(action: {
-                        handleButtonTap()
-                    }) {
-                        Text(buttonText)
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.nhsGreen)
-                            .cornerRadius(30)
-                    }
-                    .padding()
-                }
-                .background(Color("NHSGrey5"))
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    if !navigationPath.isEmpty {
-                        Button(action: {
-                            if let previousStep = navigationPath.popLast() {
-                                isNavigatingForward = false
-                                withAnimation(.easeInOut(duration: 0.3)) {
-                                    currentStep = previousStep
-                                }
-                            }
-                        }) {
-                            Image(systemName: "chevron.left")
-                                .accessibilityLabel("Back")
-                        }
-                    }
-                }
-                
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: {
-                        dismiss()
-                    }) {
-                        Image(systemName: "xmark")
-                            .accessibilityLabel("Close this form")
-                    }
-                }
+            )
+            .navigationDestination(for: BookingStep.self) { step in
+                destinationView(for: step)
             }
         }
-    }
-    
-    // Computed property for button text
-    private var buttonText: String {
-        switch currentStep {
-        case .initial:
-            return "Start now"
-        case .stepTwo:
-            return "Continue"
-        case .stepThree:
-            return "Complete"
-        }
-    }
-    
-    // Handle button action based on current step
-    private func handleButtonTap() {
-        switch currentStep {
-        case .initial:
-            navigationPath.append(currentStep)
-            isNavigatingForward = true
-            withAnimation(.easeInOut(duration: 0.3)) {
-                currentStep = .stepTwo(previousAnswer: "some answer")
-            }
-        case .stepTwo:
-            navigationPath.append(currentStep)
-            isNavigatingForward = true
-            withAnimation(.easeInOut(duration: 0.3)) {
-                currentStep = .stepThree
-            }
-        case .stepThree:
-            dismiss()
-        }
+        .environment(flowData)
     }
     
     @ViewBuilder
-    private func stepView(for step: BookingStep) -> some View {
+    private func destinationView(for step: BookingStep) -> some View {
         switch step {
         case .initial:
-            BookingStep1Content()
+            // This won't be used since .initial is the root
+            EmptyView()
         case .stepTwo(let previousAnswer):
-            BookingStep2Content(previousAnswer: previousAnswer)
+            BookingStep2View(
+                previousAnswer: previousAnswer,
+                flowData: flowData,
+                onContinue: {
+                    navigationPath.append(.stepThree)
+                },
+                onDismiss: {
+                    dismiss()
+                }
+            )
         case .stepThree:
-            BookingStep3Content()
+            BookingStep3View(
+                flowData: flowData,
+                onComplete: {
+                    dismiss()
+                },
+                onDismiss: {
+                    dismiss()
+                }
+            )
         }
     }
 }
 
 
+
 // MARK: - Form step enum
-enum BookingStep {
+enum BookingStep: Hashable {
     case initial
     case stepTwo(previousAnswer: String)
     case stepThree
@@ -170,96 +125,220 @@ enum BookingStep {
 
 
 
-// MARK: - Form step content views (without buttons)
-struct BookingStep1Content: View {
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                Text("Book or read about vaccinations")
-                    .font(.largeTitle)
-                    .bold()
-                    .fixedSize(horizontal: false, vertical: true)
-            
-                Text("Use this service to book available appointments at your GP surgery.")
-                    .font(.body)
-                    
-                // Inset text component
-                HStack(spacing: 0) {
-                    Rectangle()
-                        .fill(Color.nhsBlue)
-                        .frame(width: 8)
-                    
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("A message from your GP surgery")
-                            .font(.headline)
-                        
-                        Text("Blood tests are INVITE ONLY and should be booked with Nurse Donna at the Southbank Practice. Also book with Donna for warfarin clinic and b12 injections. Please remember to cancel your appointment if it is no longer needed. Thanks")
-                            .font(.body)
-                    }
-                    .padding(.leading, 16)
-                }
-                
-                Divider()
-
-                Text("For urgent medical advice, call 111 or visit 111.nhs.uk")
-                    .font(.body)
-                
-                RowLink {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("111 Online")
-                            .padding(.bottom, 4)
-                    }
-                    .padding(.vertical, 16)
-                } destination: { DetailView(index: 0) }
-                .padding(.horizontal, 20)
-                .background(Color.clear)
-                .overlay(RoundedRectangle(cornerRadius: 30).stroke(Color.nhsGrey4, lineWidth: 1))
-            }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .navigationBarTitleDisplayMode(.inline)
-        .background(Color("NHSGrey5"))
-    }
-}
-
-struct BookingStep2Content: View {
-    let previousAnswer: String
+// MARK: - Form steps
+struct BookingStep1View: View {
+    let flowData: BookingFlowData
+    let onContinue: () -> Void
+    let onDismiss: () -> Void
     
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                Text("Step 2: Additional Information")
-                    .font(.largeTitle)
-                    .bold()
-                    .fixedSize(horizontal: false, vertical: true)
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("Book or read about vaccinations")
+                        .font(.largeTitle)
+                        .bold()
+                        .fixedSize(horizontal: false, vertical: true)
                 
-                Text("Previous answer: \(previousAnswer)")
+                    Text("Use this service to book available appointments at your GP surgery.")
+                        .font(.body)
+                        
+                    // Inset text component
+                    HStack(spacing: 0) {
+                        
+                        // Draw the line on the left
+                        Rectangle()
+                            .fill(Color.nhsBlue)
+                            .frame(width: 8)
+                        
+                        // The text area
+                        VStack(alignment: .leading, spacing: 16) {
+                            
+                            Text("A message from your GP surgery")
+                                .font(.headline)
+                            
+                            Text("Blood tests are INVITE ONLY and should be booked with Nurse Donna at the Southbank Practice. Also book with Donna for warfarin clinic and b12 injections. Please remember to cancel your appointment if it is no longer needed. Thanks")
+                                .font(.body)
+                        }
+                        .padding(.leading, 16)
+                        
+                    } // end of the inset text component
+                    
+                    Divider()
+
+                    Text("For urgent medical advice, call 111 or visit 111.nhs.uk")
+                        .font(.body)
+                    
+                    // Ghost button for 111 Online
+                    RowLink {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("111 Online")
+                                .padding(.bottom, 4)
+                        }
+                        .padding(.vertical, 16)
+                    } destination: { DetailView(index: 0) }
+                    .padding(.horizontal, 20)
+                    .background(Color.clear)
+                    .overlay(RoundedRectangle(cornerRadius: 30).stroke(Color.nhsGrey4, lineWidth: 1))
+                    
+                    
+                } // End of the content area
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
+            
+            // Bottom button
+            VStack(spacing: 0) {
+                Divider()
+                Button(action: {
+                    // You can update flowData here before continuing
+                    flowData.answer1 = "some answer"
+                    onContinue()
+                }) {
+                    Text("Start now")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.nhsGreen)
+                        .cornerRadius(30)
+                }
+                .padding()
+            }
+            .background(Color("NHSGrey5"))
         }
         .navigationBarTitleDisplayMode(.inline)
         .background(Color("NHSGrey5"))
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: {
+                    onDismiss()
+                }) {
+                    Image(systemName: "xmark")
+                        .accessibilityLabel("Close this form")
+                }
+            }
+        }
     }
 }
 
-struct BookingStep3Content: View {
+struct BookingStep2View: View {
+    let previousAnswer: String
+    let flowData: BookingFlowData
+    let onContinue: () -> Void
+    let onDismiss: () -> Void
+    
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                Text("Final Step")
-                    .font(.largeTitle)
-                    .bold()
-                    .fixedSize(horizontal: false, vertical: true)
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("Step 2: Additional Information")
+                        .font(.largeTitle)
+                        .bold()
+                        .fixedSize(horizontal: false, vertical: true)
+                    
+                    Text("Previous answer: \(previousAnswer)")
+                    
+                    // You can also access shared data
+                    Text("From shared data: \(flowData.answer1)")
+                    
+                    // Content here
+                }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
+            
+            VStack(spacing: 0) {
+                Divider()
+                Button(action: {
+                    // Update shared data before continuing
+                    flowData.answer2 = "another answer"
+                    onContinue()
+                }) {
+                    Text("Continue")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.nhsGreen)
+                        .cornerRadius(30)
+                }
+                .padding()
+            }
+            .background(Color("NHSGrey5"))
         }
         .navigationBarTitleDisplayMode(.inline)
         .background(Color("NHSGrey5"))
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: {
+                    onDismiss()
+                }) {
+                    Image(systemName: "xmark")
+                        .accessibilityLabel("Close this form")
+                }
+            }
+        }
     }
 }
+
+struct BookingStep3View: View {
+    let flowData: BookingFlowData
+    let onComplete: () -> Void
+    let onDismiss: () -> Void
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("Final Step")
+                        .font(.largeTitle)
+                        .bold()
+                        .fixedSize(horizontal: false, vertical: true)
+                    
+                    // Access all the data collected
+                    Text("Answer 1: \(flowData.answer1)")
+                    Text("Answer 2: \(flowData.answer2)")
+                    
+                    // Content here
+                }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            
+            VStack(spacing: 0) {
+                Divider()
+                Button(action: {
+                    // Complete the flow
+                    onComplete()
+                }) {
+                    Text("Complete")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.nhsGreen)
+                        .cornerRadius(30)
+                }
+                .padding()
+            }
+            .background(Color("NHSGrey5"))
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .background(Color("NHSGrey5"))
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: {
+                    onDismiss()
+                }) {
+                    Image(systemName: "xmark")
+                        .accessibilityLabel("Close this form")
+                }
+            }
+        }
+    }
+}
+
 
 
 // MARK: - Preview
