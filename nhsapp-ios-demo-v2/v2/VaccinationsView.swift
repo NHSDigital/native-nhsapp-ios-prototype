@@ -237,7 +237,7 @@ struct BookingStep1View: View {
             
             // Bottom button
             VStack(spacing: 0) {
-                Divider()
+//                Divider()
                 Button(action: {
                     flowData.answer1 = "some answer"
                     onContinue()
@@ -252,7 +252,7 @@ struct BookingStep1View: View {
                 }
                 .padding()
             }
-            .background(Color("NHSGrey5"))
+//            .background(Color("NHSGrey5"))
         }
         .navigationBarTitleDisplayMode(.inline)
         .background(Color("NHSGrey5"))
@@ -323,7 +323,7 @@ struct BookingStep2View: View {
             }
             
             VStack(spacing: 0) {
-                Divider()
+//                Divider()
                 Button(action: {
                     if let selectedType = selectedAppointmentType {
                         flowData.selectedAppointmentType = selectedType.title
@@ -341,7 +341,7 @@ struct BookingStep2View: View {
                 .disabled(selectedAppointmentType == nil)
                 .padding()
             }
-            .background(Color("NHSGrey5"))
+//            .background(Color("NHSGrey5"))
         }
         .navigationBarTitleDisplayMode(.inline)
         .background(Color("NHSGrey5"))
@@ -411,7 +411,7 @@ struct BookingStep3View: View {
             }
             
             VStack(spacing: 0) {
-                Divider()
+//                Divider()
                 Button(action: {
                     flowData.selectedDateTime = selectedDateTime
                     onContinue()
@@ -426,7 +426,7 @@ struct BookingStep3View: View {
                 }
                 .padding()
             }
-            .background(Color("NHSGrey5"))
+//            .background(Color("NHSGrey5"))
         }
         .navigationBarTitleDisplayMode(.inline)
         .background(Color("NHSGrey5"))
@@ -480,7 +480,7 @@ struct BookingStep4View: View {
             }
             
             VStack(spacing: 0) {
-                Divider()
+//                Divider()
                 Button(action: {
                     flowData.appointmentReason = appointmentReason
                     onContinue()
@@ -496,7 +496,7 @@ struct BookingStep4View: View {
                 .disabled(appointmentReason.isEmpty)
                 .padding()
             }
-            .background(Color("NHSGrey5"))
+//            .background(Color("NHSGrey5"))
         }
         .navigationBarTitleDisplayMode(.inline)
         .background(Color("NHSGrey5"))
@@ -583,7 +583,7 @@ struct BookingStep5View: View {
             }
             
             VStack(spacing: 0) {
-                Divider()
+//                Divider()
                 Button(action: {
                     if let phone = selectedPhoneNumber {
                         flowData.selectedPhoneNumber = phone.number
@@ -601,7 +601,7 @@ struct BookingStep5View: View {
                 .disabled(selectedPhoneNumber == nil)
                 .padding()
             }
-            .background(Color("NHSGrey5"))
+//            .background(Color("NHSGrey5"))
         }
         .navigationBarTitleDisplayMode(.inline)
         .background(Color("NHSGrey5"))
@@ -690,7 +690,7 @@ struct BookingStep6View: View {
             }
             
             VStack(spacing: 0) {
-                Divider()
+//                Divider()
                 Button(action: {
                     onComplete()
                 }) {
@@ -704,7 +704,7 @@ struct BookingStep6View: View {
                 }
                 .padding()
             }
-            .background(Color("NHSGrey5"))
+//            .background(Color("NHSGrey5"))
         }
         .navigationBarTitleDisplayMode(.inline)
         .background(Color("NHSGrey5"))
@@ -763,8 +763,10 @@ struct BookingStep7View: View {
                         .cornerRadius(30)
                     }
                     .padding(.horizontal)
-                    .padding(.bottom, 20)
+                    .padding(.bottom, 16)
 
+                    
+                    // Main content area
                     VStack(alignment: .leading, spacing: 24) {
                         
                         // What happens next section
@@ -773,45 +775,68 @@ struct BookingStep7View: View {
                                 .font(.title3)
                                 .bold()
                             
-                            Text("You will be called by your GP surgery at 8:15 on Wednesday, 24 July 2025.")
+                            Text("You will be called by your GP surgery at 8:15 on Wednesday, 24 July 2025. Keep your phone with you at all times, and be aware the GP number may be withheld.")
                                 .font(.body)
-                            
-                            Text("Keep your phone with you at all times, and be aware the GP number may be withheld.")
-                                .font(.body)
+
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.bottom, 8)
-                        
-                        Divider()
-                        
-                        // Appointment details
+                                                
+                        // Appointment details card
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Your appointment details")
-                                .font(.title3)
-                                .bold()
                             
-                            Text(flowData.selectedAppointmentType)
-                                .font(.body)
-                                .bold()
+                            // Appointment details text
+                            VStack(alignment: .leading, spacing: 12) {
+                                
+                                Text("Your appointment details")
+                                    .font(.body)
+                                    .foregroundColor(Color.nhsGrey1)
+                                
+                                Text(flowData.selectedAppointmentType)
+                                    .font(.body)
+                                    .bold()
+                                
+                                if let dateTime = flowData.selectedDateTime {
+                                    Text(dateTime.formatted(date: .long, time: .shortened))
+                                        .font(.body)
+                                        .bold()
+                                }
+                                
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Southbank Practice")
+                                        .font(.body)
+                                    Text("12345 Bottom Boulevard")
+                                        .font(.body)
+                                    Text("London, SE1 6AB")
+                                        .font(.body)
+                                }
+                            }
+                            .padding(.horizontal)
+                            .padding(.top, 8)
+                            .padding(.bottom, 4)
                             
-                            if let dateTime = flowData.selectedDateTime {
-                                Text(dateTime.formatted(date: .long, time: .shortened))
-                                    .font(.body)
+                            Button(action: {
+                                // Add to calendar action
+                            }) {
+                                Text("Add to your calendar")
+                                    .font(.headline)
+                                    .foregroundColor(Color.nhsBlue)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(.clear)
+                                    .cornerRadius(30)
+                                    .overlay(RoundedRectangle(cornerRadius: 30).stroke(Color.nhsBlue, lineWidth: 1))
+
                             }
-                                                        
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Southbank Practice")
-                                    .font(.body)
-                                Text("12345 Bottom Boulevard")
-                                    .font(.body)
-                                Text("London, SE1 6AB")
-                                    .font(.body)
-                            }
+                            .padding(.horizontal)
+                            .padding(.bottom, 16)
+                            
+                            
                         }
                         .padding(.top, 8)
                         .frame(maxWidth: .infinity, alignment: .leading)
-//                        .background(Color.white)
-//                        .cornerRadius(8)
+                        .background(Color.white)
+                        .cornerRadius(30)
                     }
                     .padding()
                 }
@@ -820,14 +845,14 @@ struct BookingStep7View: View {
             
             // Bottom button
             VStack(spacing: 0) {
-                Divider()
+//                Divider()
                 NavigationLink(destination: AppointmentsView()) {
                     Text("Exit this service")
-                        .font(.headline)
+                        .font(.body)
                         .foregroundColor(Color.black)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.white)
+//                        .background(Color.white)
                         .cornerRadius(30)
                 }
                 .simultaneousGesture(TapGesture().onEnded {
@@ -835,7 +860,7 @@ struct BookingStep7View: View {
                 })
                 .padding()
             }
-            .background(Color("NHSGrey5"))
+//            .background(Color("NHSGrey5"))
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true) // Hide back button on confirmation screen
