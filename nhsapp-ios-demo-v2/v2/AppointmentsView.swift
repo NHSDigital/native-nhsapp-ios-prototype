@@ -3,6 +3,8 @@ import SwiftUI
 struct AppointmentsView: View {
     @State private var showAppointmentsSheet = false
     @State private var showBookingFlow = false
+    
+    @Environment(\.isNavigated) private var isNavigated
 
     var body: some View {
         List {
@@ -10,6 +12,7 @@ struct AppointmentsView: View {
                 // Book an appointment - navigates to embedded flow
                 Button(action: {
                     showBookingFlow = true
+                    isNavigated.wrappedValue = true
                 }) {
                     HStack {
                         Text("Book an appointment")
@@ -68,6 +71,9 @@ struct AppointmentsView: View {
                 .environment(\.dismissToRoot, {
                     showBookingFlow = false
                 })
+                .onAppear {
+                    isNavigated.wrappedValue = true
+                }
         }
         .sheet(isPresented: $showAppointmentsSheet) {
             BookingFlowCoordinator()

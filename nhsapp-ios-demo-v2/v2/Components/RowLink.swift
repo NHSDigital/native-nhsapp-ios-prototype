@@ -8,6 +8,7 @@ struct RowLink<Label: View, Destination: View>: View {
     var horizontalPadding: CGFloat = 0
 
     @State private var isPresented = false
+    @Environment(\.isNavigated) private var isNavigated
 
     // 1) Custom label
     init(
@@ -46,8 +47,16 @@ struct RowLink<Label: View, Destination: View>: View {
         }
         .padding(.horizontal, horizontalPadding)
         .contentShape(Rectangle())
-        .onTapGesture { isPresented = true }
-        .navigationDestination(isPresented: $isPresented, destination: destination)
+        .onTapGesture {
+            isPresented = true
+            isNavigated.wrappedValue = true
+        }
+        .navigationDestination(isPresented: $isPresented) {
+            destination()
+                .onAppear {
+                    isNavigated.wrappedValue = true
+                }
+        }
         .buttonStyle(.plain)
         .accessibilityAddTraits(.isButton)
     }
