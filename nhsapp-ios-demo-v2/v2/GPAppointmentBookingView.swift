@@ -1,6 +1,6 @@
 import SwiftUI
 
-// MARK: - Embedded Flow Step 1
+// MARK: - Flow step 1: start screen
 struct BookingEmbeddedStep1View: View {
     @State private var flowData = BookingFlowData()
     @Environment(\.dismissToRoot) private var dismissToRoot
@@ -75,7 +75,7 @@ struct BookingEmbeddedStep1View: View {
     }
 }
 
-// MARK: - Embedded Flow Step 2
+// MARK: - Flow step 2: select appointment type
 struct BookingEmbeddedStep2View: View {
     @State var flowData: BookingFlowData
     @State private var selectedAppointmentType: AppointmentType?
@@ -128,7 +128,7 @@ struct BookingEmbeddedStep2View: View {
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(selectedAppointmentType != nil ? Color.nhsGreen : Color.nhsGrey3)
+                        .background(selectedAppointmentType != nil ? Color.nhsGreen : Color.nhsGreen)
                         .cornerRadius(30)
                 }
                 .buttonStyle(.plain)
@@ -147,7 +147,7 @@ struct BookingEmbeddedStep2View: View {
     }
 }
 
-// MARK: - Embedded Flow Step 3
+// MARK: - Flow step 3: select date and time
 struct BookingEmbeddedStep3View: View {
     @Environment(\.dismissToRoot) private var dismissToRoot
     @State var flowData: BookingFlowData
@@ -193,7 +193,7 @@ struct BookingEmbeddedStep3View: View {
     }
 }
 
-// MARK: - Embedded Flow Step 4
+// MARK: - Flow step 4: appointment reason
 struct BookingEmbeddedStep4View: View {
     @Environment(\.dismissToRoot) private var dismissToRoot
     @State var flowData: BookingFlowData
@@ -234,7 +234,7 @@ struct BookingEmbeddedStep4View: View {
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(!appointmentReason.isEmpty ? Color.nhsGreen : Color.nhsGrey3)
+                        .background(!appointmentReason.isEmpty ? Color.nhsGreen : Color.nhsGreen)
                         .cornerRadius(30)
                 }
                 .buttonStyle(.plain)
@@ -251,7 +251,7 @@ struct BookingEmbeddedStep4View: View {
     }
 }
 
-// MARK: - Embedded Flow Step 5
+// MARK: - Flow step 5: select phone number
 struct BookingEmbeddedStep5View: View {
     @Environment(\.dismissToRoot) private var dismissToRoot
     @State var flowData: BookingFlowData
@@ -325,7 +325,7 @@ struct BookingEmbeddedStep5View: View {
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(selectedPhoneNumber != nil ? Color.nhsGreen : Color.nhsGrey3)
+                        .background(selectedPhoneNumber != nil ? Color.nhsGreen : Color.nhsGreen)
                         .cornerRadius(30)
                 }
                 .buttonStyle(.plain)
@@ -344,7 +344,7 @@ struct BookingEmbeddedStep5View: View {
     }
 }
 
-// MARK: - Embedded Flow Step 6
+// MARK: - Flow step 6: confirm details
 struct BookingEmbeddedStep6View: View {
     @Environment(\.dismissToRoot) private var dismissToRoot
     @State var flowData: BookingFlowData
@@ -504,7 +504,7 @@ struct BookingEmbeddedStep6View: View {
     }
 }
 
-// MARK: - Edit Sheets
+// MARK: - Edit sheets for checking answers
 
 struct EditAppointmentTypeSheet: View {
     @State var flowData: BookingFlowData
@@ -563,7 +563,7 @@ struct EditAppointmentTypeSheet: View {
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(selectedAppointmentType != nil ? Color.nhsGreen : Color.nhsGrey3)
+                            .background(selectedAppointmentType != nil ? Color.nhsGreen : Color.nhsGreen)
                             .cornerRadius(30)
                     }
                     .disabled(selectedAppointmentType == nil)
@@ -693,7 +693,7 @@ struct EditReasonSheet: View {
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(!appointmentReason.isEmpty ? Color.nhsGreen : Color.nhsGrey3)
+                            .background(!appointmentReason.isEmpty ? Color.nhsGreen : Color.nhsGreen)
                             .cornerRadius(30)
                     }
                     .disabled(appointmentReason.isEmpty)
@@ -798,7 +798,7 @@ struct EditPhoneNumberSheet: View {
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(selectedPhoneNumber != nil ? Color.nhsGreen : Color.nhsGrey3)
+                            .background(selectedPhoneNumber != nil ? Color.nhsGreen : Color.nhsGreen)
                             .cornerRadius(30)
                     }
                     .disabled(selectedPhoneNumber == nil)
@@ -825,7 +825,7 @@ struct EditPhoneNumberSheet: View {
     }
 }
 
-// MARK: - Embedded Flow Step 7
+// MARK: - Flow step 7: booking confirmed
 struct BookingEmbeddedStep7View: View {
     @State var flowData: BookingFlowData
     @Environment(\.dismissToRoot) private var dismissToRoot
@@ -896,13 +896,13 @@ struct BookingEmbeddedStep7View: View {
                                 // Add to calendar action
                             }) {
                                 Text("Add to your calendar")
-                                    .font(.headline)
+                                    .font(.body)
                                     .foregroundColor(Color.nhsBlue)
                                     .frame(maxWidth: .infinity)
                                     .padding()
                                     .background(.clear)
                                     .cornerRadius(30)
-                                    .overlay(RoundedRectangle(cornerRadius: 30).stroke(Color.nhsBlue, lineWidth: 1))
+                                    .overlay(RoundedRectangle(cornerRadius: 30).stroke(Color.nhsBlue.opacity(0.5), lineWidth: 1))
                             }
                             .padding(.horizontal)
                             .padding(.top, 8)
