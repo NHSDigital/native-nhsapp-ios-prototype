@@ -13,7 +13,7 @@ struct AppointmentsView: View {
                 }) {
                     HStack {
                         Text("Book an appointment")
-                            .foregroundColor(.primary)
+                            .foregroundColor(.nhsBlack)
                         Spacer()
                         Image(systemName: "chevron.right")
                             .font(.system(size: 14, weight: .semibold))

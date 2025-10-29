@@ -99,7 +99,7 @@ struct BookingEmbeddedStep2View: View {
                             HStack {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(option.title)
-                                        .foregroundColor(.black)
+                                        .foregroundColor(.nhsBlack)
                                         .font(.body)
                                 }
                                 
@@ -282,7 +282,7 @@ struct BookingEmbeddedStep5View: View {
                                 HStack {
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text(option.label)
-                                            .foregroundColor(.black)
+                                            .foregroundColor(.nhsBlack)
                                             .font(.body)
                                         Text(option.number)
                                             .foregroundColor(.secondary)
@@ -374,7 +374,7 @@ struct BookingEmbeddedStep6View: View {
                                         .foregroundColor(.gray)
                                     Text(flowData.selectedAppointmentType)
                                         .font(.body)
-                                        .foregroundColor(.black)
+                                        .foregroundColor(.nhsBlack)
                                 }
                                 Spacer()
                                 Image(systemName: "chevron.right")
@@ -400,7 +400,7 @@ struct BookingEmbeddedStep6View: View {
                                     if let dateTime = flowData.selectedDateTime {
                                         Text(dateTime.formatted(date: .long, time: .shortened))
                                             .font(.body)
-                                            .foregroundColor(.black)
+                                            .foregroundColor(.nhsBlack)
                                     }
                                 }
                                 Spacer()
@@ -426,7 +426,7 @@ struct BookingEmbeddedStep6View: View {
                                         .foregroundColor(.gray)
                                     Text(flowData.appointmentReason)
                                         .font(.body)
-                                        .foregroundColor(.black)
+                                        .foregroundColor(.nhsBlack)
                                 }
                                 Spacer()
                                 Image(systemName: "chevron.right")
@@ -451,7 +451,7 @@ struct BookingEmbeddedStep6View: View {
                                         .foregroundColor(.gray)
                                     Text(flowData.selectedPhoneNumber)
                                         .font(.body)
-                                        .foregroundColor(.black)
+                                        .foregroundColor(.nhsBlack)
                                 }
                                 Spacer()
                                 Image(systemName: "chevron.right")
@@ -530,7 +530,7 @@ struct EditAppointmentTypeSheet: View {
                                 HStack {
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text(option.title)
-                                            .foregroundColor(.black)
+                                            .foregroundColor(.nhsBlack)
                                             .font(.body)
                                     }
                                     
@@ -751,7 +751,7 @@ struct EditPhoneNumberSheet: View {
                                     HStack {
                                         VStack(alignment: .leading, spacing: 4) {
                                             Text(option.label)
-                                                .foregroundColor(.black)
+                                                .foregroundColor(.nhsBlack)
                                                 .font(.body)
                                             Text(option.number)
                                                 .foregroundColor(.secondary)
@@ -849,6 +849,7 @@ struct BookingEmbeddedStep7View: View {
                     }
                     .padding(.horizontal)
                     .padding(.bottom, 16)
+                    .padding(.top, 20)
                     
                     VStack(alignment: .leading, spacing: 24) {
                         VStack(alignment: .leading, spacing: 12) {
@@ -921,12 +922,20 @@ struct BookingEmbeddedStep7View: View {
                 Button(action: {
                     dismissToRoot()
                 }) {
-                    Text("Exit this service")
-                        .font(.body)
-                        .foregroundColor(Color.black)
-                        .frame(maxWidth: .infinity)
-                        .padding()
+                    HStack {
+                        Text("Exit this service")
+                            .font(.body)
+                            .foregroundColor(Color.nhsBlack)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(Color.accentColor.opacity(0.7))
+                    }
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(30)
                 }
+                .buttonStyle(.plain)
                 .padding()
             }
         }
@@ -936,6 +945,8 @@ struct BookingEmbeddedStep7View: View {
         .environment(flowData)
     }
 }
+
+
 
 // MARK: - Dismiss to Root Environment Key
 private struct DismissToRootKey: EnvironmentKey {
@@ -951,6 +962,9 @@ extension EnvironmentValues {
 
 
 
+// MARK: - Preview
 #Preview {
-    AppointmentsView()
+    NavigationStack {
+        AppointmentsView()
+    }
 }
