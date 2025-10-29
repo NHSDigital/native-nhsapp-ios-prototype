@@ -82,7 +82,14 @@ struct BookingFlowCoordinator: View {
             BookingStep2View(
                 flowData: flowData,
                 onContinue: {
-                    navigationPath.append(.selectDateTime)
+                    // Check if we're editing from confirmation screen
+                    if navigationPath.contains(.confirmationStep) {
+                        // Pop back to confirmation
+                        navigationPath.removeLast()
+                    } else {
+                        // Normal flow - continue to next step
+                        navigationPath.append(.selectDateTime)
+                    }
                 },
                 onDismiss: {
                     dismiss()
@@ -92,7 +99,11 @@ struct BookingFlowCoordinator: View {
             BookingStep3View(
                 flowData: flowData,
                 onContinue: {
-                    navigationPath.append(.appointmentReason)
+                    if navigationPath.contains(.confirmationStep) {
+                        navigationPath.removeLast()
+                    } else {
+                        navigationPath.append(.appointmentReason)
+                    }
                 },
                 onDismiss: {
                     dismiss()
@@ -102,7 +113,11 @@ struct BookingFlowCoordinator: View {
             BookingStep4View(
                 flowData: flowData,
                 onContinue: {
-                    navigationPath.append(.selectPhoneNumber)
+                    if navigationPath.contains(.confirmationStep) {
+                        navigationPath.removeLast()
+                    } else {
+                        navigationPath.append(.selectPhoneNumber)
+                    }
                 },
                 onDismiss: {
                     dismiss()
@@ -112,7 +127,11 @@ struct BookingFlowCoordinator: View {
             BookingStep5View(
                 flowData: flowData,
                 onContinue: {
-                    navigationPath.append(.confirmationStep)
+                    if navigationPath.contains(.confirmationStep) {
+                        navigationPath.removeLast()
+                    } else {
+                        navigationPath.append(.confirmationStep)
+                    }
                 },
                 onDismiss: {
                     dismiss()
@@ -663,34 +682,106 @@ struct BookingStep6View: View {
                         .bold()
                         .fixedSize(horizontal: false, vertical: true)
                     
-                    // Summary of all collected data
-                    VStack(alignment: .leading, spacing: 16) {
-                        SummaryRow(title: "Appointment type", value: flowData.selectedAppointmentType)
-                        
-                        Divider()
-                        
-                        if let dateTime = flowData.selectedDateTime {
-                            SummaryRow(title: "Date and time", value: dateTime.formatted(date: .long, time: .shortened))
+                    // Summary of all collected data with edit links
+                    VStack(alignment: .leading, spacing: 0) {
+                        NavigationLink(value: BookingStep.selectAppointmentType) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Appointment type")
+                                        .font(.body)
+                                        .bold()
+                                        .foregroundColor(.gray)
+                                    Text(flowData.selectedAppointmentType)
+                                        .font(.body)
+                                        .foregroundColor(.black)
+                                }
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.primary.opacity(0.7))
+                            }
+                            .contentShape(Rectangle())
+                            .padding(.vertical, 12)
                         }
                         
                         Divider()
                         
-                        SummaryRow(title: "Reason", value: flowData.appointmentReason)
+                        NavigationLink(value: BookingStep.selectDateTime) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Date and time")
+                                        .font(.body)
+                                        .bold()
+                                        .foregroundColor(.gray)
+                                    if let dateTime = flowData.selectedDateTime {
+                                        Text(dateTime.formatted(date: .long, time: .shortened))
+                                            .font(.body)
+                                            .foregroundColor(.black)
+                                    }
+                                }
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.primary.opacity(0.7))
+                            }
+                            .contentShape(Rectangle())
+                            .padding(.vertical, 12)
+                        }
                         
                         Divider()
                         
-                        SummaryRow(title: "Contact number", value: flowData.selectedPhoneNumber)
+                        NavigationLink(value: BookingStep.appointmentReason) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Reason")
+                                        .font(.body)
+                                        .bold()
+                                        .foregroundColor(.gray)
+                                    Text(flowData.appointmentReason)
+                                        .font(.body)
+                                        .foregroundColor(.black)
+                                        .lineLimit(2)
+                                }
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.primary.opacity(0.7))
+                            }
+                            .contentShape(Rectangle())
+                            .padding(.vertical, 12)
+                        }
+                        
+                        Divider()
+                        
+                        NavigationLink(value: BookingStep.selectPhoneNumber) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Contact number")
+                                        .font(.body)
+                                        .bold()
+                                        .foregroundColor(.gray)
+                                    Text(flowData.selectedPhoneNumber)
+                                        .font(.body)
+                                        .foregroundColor(.black)
+                                }
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.primary.opacity(0.7))
+                            }
+                            .contentShape(Rectangle())
+                            .padding(.vertical, 12)
+                        }
                     }
-//                    .padding()
-//                    .background(Color.white)
-//                    .cornerRadius(10)
+                    .padding(.horizontal)
+                    .background(Color.white)
+                    .cornerRadius(30)
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             
             VStack(spacing: 0) {
-//                Divider()
                 Button(action: {
                     onComplete()
                 }) {
@@ -704,7 +795,6 @@ struct BookingStep6View: View {
                 }
                 .padding()
             }
-//            .background(Color("NHSGrey5"))
         }
         .navigationBarTitleDisplayMode(.inline)
         .background(Color("NHSGrey5"))
@@ -721,22 +811,7 @@ struct BookingStep6View: View {
     }
 }
 
-// Helper view for summary rows
-struct SummaryRow: View {
-    let title: String
-    let value: String
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .font(.body)
-                .bold()
-//                .foregroundColor(.secondary)
-            Text(value)
-                .font(.body)
-        }
-    }
-}
+
 
 // MARK: - Form step 7 - Final confirmation screen
 struct BookingStep7View: View {
@@ -829,9 +904,8 @@ struct BookingStep7View: View {
 
                             }
                             .padding(.horizontal)
+                            .padding(.top, 8)
                             .padding(.bottom, 16)
-                            
-                            
                         }
                         .padding(.top, 8)
                         .frame(maxWidth: .infinity, alignment: .leading)
