@@ -40,8 +40,10 @@ struct VaccinationsView: View {
 @Observable
 class BookingFlowData {
     var answer1: String = ""
-    var answer2: String = ""
-    var selectedDate: Date?
+    var selectedAppointmentType: String = ""
+    var selectedDateTime: Date?
+    var appointmentReason: String = ""
+    var selectedPhoneNumber: String = ""
     // Add any other data you need to share between steps
 }
 
@@ -58,7 +60,7 @@ struct BookingFlowCoordinator: View {
             BookingStep1View(
                 flowData: flowData,
                 onContinue: {
-                    navigationPath.append(.stepTwo(previousAnswer: flowData.answer1))
+                    navigationPath.append(.selectAppointmentType)
                 },
                 onDismiss: {
                     dismiss()
@@ -75,25 +77,60 @@ struct BookingFlowCoordinator: View {
     private func destinationView(for step: BookingStep) -> some View {
         switch step {
         case .initial:
-            // This won't be used since .initial is the root
             EmptyView()
-        case .stepTwo(let previousAnswer):
+        case .selectAppointmentType:
             BookingStep2View(
-                previousAnswer: previousAnswer,
                 flowData: flowData,
                 onContinue: {
-                    navigationPath.append(.stepThree)
+                    navigationPath.append(.selectDateTime)
                 },
                 onDismiss: {
                     dismiss()
                 }
             )
-        case .stepThree:
+        case .selectDateTime:
             BookingStep3View(
                 flowData: flowData,
-                onComplete: {
-                    dismiss()
+                onContinue: {
+                    navigationPath.append(.appointmentReason)
                 },
+                onDismiss: {
+                    dismiss()
+                }
+            )
+        case .appointmentReason:
+            BookingStep4View(
+                flowData: flowData,
+                onContinue: {
+                    navigationPath.append(.selectPhoneNumber)
+                },
+                onDismiss: {
+                    dismiss()
+                }
+            )
+        case .selectPhoneNumber:
+            BookingStep5View(
+                flowData: flowData,
+                onContinue: {
+                    navigationPath.append(.confirmationStep)
+                },
+                onDismiss: {
+                    dismiss()
+                }
+            )
+        case .confirmationStep:
+            BookingStep6View(
+                flowData: flowData,
+                onComplete: {
+                    navigationPath.append(.finalConfirmation)
+                },
+                onDismiss: {
+                    dismiss()
+                }
+            )
+        case .finalConfirmation:
+            BookingStep7View(
+                flowData: flowData,
                 onDismiss: {
                     dismiss()
                 }
@@ -107,25 +144,36 @@ struct BookingFlowCoordinator: View {
 // MARK: - Form step enum
 enum BookingStep: Hashable {
     case initial
-    case stepTwo(previousAnswer: String)
-    case stepThree
+    case selectAppointmentType
+    case selectDateTime
+    case appointmentReason
+    case selectPhoneNumber
+    case confirmationStep
+    case finalConfirmation
     
-    // Add a computed property for unique identification
     var id: String {
         switch self {
         case .initial:
             return "initial"
-        case .stepTwo:
-            return "stepTwo"
-        case .stepThree:
-            return "stepThree"
+        case .selectAppointmentType:
+            return "selectAppointmentType"
+        case .selectDateTime:
+            return "selectDateTime"
+        case .appointmentReason:
+            return "appointmentReason"
+        case .selectPhoneNumber:
+            return "selectPhoneNumber"
+        case .confirmationStep:
+            return "confirmationStep"
+        case .finalConfirmation:
+            return "finalConfirmation"
         }
     }
 }
 
 
 
-// MARK: - Form steps
+// MARK: - Form step 1
 struct BookingStep1View: View {
     let flowData: BookingFlowData
     let onContinue: () -> Void
@@ -135,7 +183,7 @@ struct BookingStep1View: View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("Book or read about vaccinations")
+                    Text("Book an available GP appointment")
                         .font(.largeTitle)
                         .bold()
                         .fixedSize(horizontal: false, vertical: true)
@@ -191,7 +239,6 @@ struct BookingStep1View: View {
             VStack(spacing: 0) {
                 Divider()
                 Button(action: {
-                    // You can update flowData here before continuing
                     flowData.answer1 = "some answer"
                     onContinue()
                 }) {
@@ -222,27 +269,142 @@ struct BookingStep1View: View {
     }
 }
 
+// MARK: - Form step 2 - Select appointment type
 struct BookingStep2View: View {
-    let previousAnswer: String
     let flowData: BookingFlowData
     let onContinue: () -> Void
     let onDismiss: () -> Void
+    
+    @State private var selectedAppointmentType: AppointmentType?
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Select an appointment type")
+                        .font(.title)
+                        .bold()
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.horizontal)
+                        .padding(.top)
+                    
+                    // Radio list items
+                    List {
+                        ForEach(AppointmentType.allCases) { option in
+                            Button(action: {
+                                selectedAppointmentType = option
+                            }) {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(option.title)
+                                            .foregroundColor(.black)
+                                            .font(.body)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    if selectedAppointmentType == option {
+                                        Image(systemName: "checkmark")
+                                            .font(.system(size: 16, weight: .semibold))
+                                            .foregroundColor(Color("NHSGreen"))
+                                    }
+                                }
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .listStyle(.insetGrouped)
+                    .frame(height: CGFloat(AppointmentType.allCases.count) * 60)
+                    .scrollDisabled(true)
+                    
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            
+            VStack(spacing: 0) {
+                Divider()
+                Button(action: {
+                    if let selectedType = selectedAppointmentType {
+                        flowData.selectedAppointmentType = selectedType.title
+                        onContinue()
+                    }
+                }) {
+                    Text("Continue")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(selectedAppointmentType != nil ? Color.nhsGreen : Color.nhsGreen)
+                        .cornerRadius(30)
+                }
+                .disabled(selectedAppointmentType == nil)
+                .padding()
+            }
+            .background(Color("NHSGrey5"))
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .background(Color("NHSGrey5"))
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: {
+                    onDismiss()
+                }) {
+                    Image(systemName: "xmark")
+                        .accessibilityLabel("Close this form")
+                }
+            }
+        }
+    }
+}
+
+enum AppointmentType: String, CaseIterable, Identifiable {
+    case asthma = "asthma"
+    case bloodTest = "bloodTest"
+    case generalGP = "generalGP"
+    case contraception = "contraception"
+    case onlineForm = "onlineForm"
+    
+    var id: String { rawValue }
+    
+    var title: String {
+        switch self {
+        case .asthma:
+            return "Asthma clinic"
+        case .bloodTest:
+            return "Blood test"
+        case .generalGP:
+            return "General GP appointment"
+        case .contraception:
+            return "Contraception appointment"
+        case .onlineForm:
+            return "Contact your GP using an online form"
+        }
+    }
+}
+
+// MARK: - Form step 3 - Select date and time
+struct BookingStep3View: View {
+    let flowData: BookingFlowData
+    let onContinue: () -> Void
+    let onDismiss: () -> Void
+    
+    @State private var selectedDateTime: Date = Date()
     
     var body: some View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("Step 2: Additional Information")
-                        .font(.largeTitle)
+                    Text("Select an appointment date and time")
+                        .font(.title)
                         .bold()
                         .fixedSize(horizontal: false, vertical: true)
                     
-                    Text("Previous answer: \(previousAnswer)")
+                    // Date picker
+                    DatePicker("Select date and time", selection: $selectedDateTime, displayedComponents: [.date, .hourAndMinute])
+                        .datePickerStyle(.graphical)
                     
-                    // You can also access shared data
-                    Text("From shared data: \(flowData.answer1)")
-                    
-                    // Content here
+                    // You can add more UI elements here like available time slots
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -251,8 +413,7 @@ struct BookingStep2View: View {
             VStack(spacing: 0) {
                 Divider()
                 Button(action: {
-                    // Update shared data before continuing
-                    flowData.answer2 = "another answer"
+                    flowData.selectedDateTime = selectedDateTime
                     onContinue()
                 }) {
                     Text("Continue")
@@ -282,25 +443,37 @@ struct BookingStep2View: View {
     }
 }
 
-struct BookingStep3View: View {
+// MARK: - Form step 4 - Appointment reason
+struct BookingStep4View: View {
     let flowData: BookingFlowData
-    let onComplete: () -> Void
+    let onContinue: () -> Void
     let onDismiss: () -> Void
+    
+    @State private var appointmentReason: String = ""
     
     var body: some View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("Final Step")
-                        .font(.largeTitle)
+                    Text("What is the reason for your appointment?")
+                        .font(.title)
                         .bold()
                         .fixedSize(horizontal: false, vertical: true)
                     
-                    // Access all the data collected
-                    Text("Answer 1: \(flowData.answer1)")
-                    Text("Answer 2: \(flowData.answer2)")
+                    Text("Please provide a brief description of why you need this appointment.")
+                        .font(.body)
+                        .foregroundColor(.secondary)
                     
-                    // Content here
+                    // Text editor for reason
+                    TextEditor(text: $appointmentReason)
+                        .frame(minHeight: 150)
+                        .padding(16)
+                        .background(Color.white)
+                        .cornerRadius(30)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 30)
+                                .stroke(Color.nhsGrey4, lineWidth: 1)
+                        )
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -309,10 +482,219 @@ struct BookingStep3View: View {
             VStack(spacing: 0) {
                 Divider()
                 Button(action: {
-                    // Complete the flow
+                    flowData.appointmentReason = appointmentReason
+                    onContinue()
+                }) {
+                    Text("Continue")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(!appointmentReason.isEmpty ? Color.nhsGreen : Color.nhsGreen)
+                        .cornerRadius(30)
+                }
+                .disabled(appointmentReason.isEmpty)
+                .padding()
+            }
+            .background(Color("NHSGrey5"))
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .background(Color("NHSGrey5"))
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: {
+                    onDismiss()
+                }) {
+                    Image(systemName: "xmark")
+                        .accessibilityLabel("Close this form")
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Form step 5 - Select phone number
+struct BookingStep5View: View {
+    let flowData: BookingFlowData
+    let onContinue: () -> Void
+    let onDismiss: () -> Void
+    
+    @State private var selectedPhoneNumber: PhoneNumberOption?
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Select a phone number for this appointment")
+                        .font(.title)
+                        .bold()
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.horizontal)
+                        .padding(.top)
+                    
+                    Text("We'll call you on this number if we need to contact you about your appointment.")
+                        .font(.body)
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal)
+                        .padding(.top, 8)
+                    
+                    // Phone number options
+                    VStack(spacing: 0) {
+                        ForEach(PhoneNumberOption.allCases) { option in
+                            Button(action: {
+                                selectedPhoneNumber = option
+                            }) {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(option.label)
+                                            .foregroundColor(.black)
+                                            .font(.body)
+                                        Text(option.number)
+                                            .foregroundColor(.secondary)
+                                            .font(.subheadline)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    if selectedPhoneNumber == option {
+                                        Image(systemName: "checkmark")
+                                            .font(.system(size: 16, weight: .semibold))
+                                            .foregroundColor(Color("NHSGreen"))
+                                    }
+                                }
+                                .contentShape(Rectangle())
+                                .padding()
+                            }
+                            .buttonStyle(.plain)
+                            .background(Color.white)
+                            
+                            if option != PhoneNumberOption.allCases.last {
+                                Divider()
+                                    .padding(.horizontal)
+                            }
+                        }
+                    }
+                    .background(Color.white)
+                    .cornerRadius(30)
+                    .padding(.horizontal)
+                    .padding(.top, 20)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            
+            VStack(spacing: 0) {
+                Divider()
+                Button(action: {
+                    if let phone = selectedPhoneNumber {
+                        flowData.selectedPhoneNumber = phone.number
+                        onContinue()
+                    }
+                }) {
+                    Text("Continue")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(selectedPhoneNumber != nil ? Color.nhsGreen : Color.nhsGreen)
+                        .cornerRadius(30)
+                }
+                .disabled(selectedPhoneNumber == nil)
+                .padding()
+            }
+            .background(Color("NHSGrey5"))
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .background(Color("NHSGrey5"))
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: {
+                    onDismiss()
+                }) {
+                    Image(systemName: "xmark")
+                        .accessibilityLabel("Close this form")
+                }
+            }
+        }
+    }
+}
+
+enum PhoneNumberOption: String, CaseIterable, Identifiable {
+    case mobile = "mobile"
+    case home = "home"
+    case work = "work"
+    
+    var id: String { rawValue }
+    
+    var label: String {
+        switch self {
+        case .mobile:
+            return "Mobile"
+        case .home:
+            return "Home"
+        case .work:
+            return "Work"
+        }
+    }
+    
+    var number: String {
+        switch self {
+        case .mobile:
+            return "07123 456789"
+        case .home:
+            return "020 1234 5678"
+        case .work:
+            return "020 9876 5432"
+        }
+    }
+}
+
+// MARK: - Form step 6 - Final confirmation
+struct BookingStep6View: View {
+    let flowData: BookingFlowData
+    let onComplete: () -> Void
+    let onDismiss: () -> Void
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("Confirm your appointment details")
+                        .font(.title)
+                        .bold()
+                        .fixedSize(horizontal: false, vertical: true)
+                    
+                    // Summary of all collected data
+                    VStack(alignment: .leading, spacing: 16) {
+                        SummaryRow(title: "Appointment type", value: flowData.selectedAppointmentType)
+                        
+                        Divider()
+                        
+                        if let dateTime = flowData.selectedDateTime {
+                            SummaryRow(title: "Date and time", value: dateTime.formatted(date: .long, time: .shortened))
+                        }
+                        
+                        Divider()
+                        
+                        SummaryRow(title: "Reason", value: flowData.appointmentReason)
+                        
+                        Divider()
+                        
+                        SummaryRow(title: "Contact number", value: flowData.selectedPhoneNumber)
+                    }
+//                    .padding()
+//                    .background(Color.white)
+//                    .cornerRadius(10)
+                }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            
+            VStack(spacing: 0) {
+                Divider()
+                Button(action: {
                     onComplete()
                 }) {
-                    Text("Complete")
+                    Text("Confirm booking")
                         .font(.headline)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
@@ -339,9 +721,139 @@ struct BookingStep3View: View {
     }
 }
 
+// Helper view for summary rows
+struct SummaryRow: View {
+    let title: String
+    let value: String
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.body)
+                .bold()
+//                .foregroundColor(.secondary)
+            Text(value)
+                .font(.body)
+        }
+    }
+}
 
+// MARK: - Form step 7 - Final confirmation screen
+struct BookingStep7View: View {
+    let flowData: BookingFlowData
+    let onDismiss: () -> Void
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    
+                    // Green title box
+                    VStack(alignment: .leading, spacing: 0) {
+                        HStack {
+                            Text("Appointment confirmed")
+                                .font(.largeTitle)
+                                .bold()
+                                .foregroundColor(.white)
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                        .padding(.vertical)
+                        .background(Color.nhsGreen)
+                        .cornerRadius(30)
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 20)
+
+                    VStack(alignment: .leading, spacing: 24) {
+                        
+                        // What happens next section
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("What happens next")
+                                .font(.title3)
+                                .bold()
+                            
+                            Text("You will be called by your GP surgery at 8:15 on Wednesday, 24 July 2025.")
+                                .font(.body)
+                            
+                            Text("Keep your phone with you at all times, and be aware the GP number may be withheld.")
+                                .font(.body)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.bottom, 8)
+                        
+                        Divider()
+                        
+                        // Appointment details
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Your appointment details")
+                                .font(.title3)
+                                .bold()
+                            
+                            Text(flowData.selectedAppointmentType)
+                                .font(.body)
+                                .bold()
+                            
+                            if let dateTime = flowData.selectedDateTime {
+                                Text(dateTime.formatted(date: .long, time: .shortened))
+                                    .font(.body)
+                            }
+                                                        
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Southbank Practice")
+                                    .font(.body)
+                                Text("12345 Bottom Boulevard")
+                                    .font(.body)
+                                Text("London, SE1 6AB")
+                                    .font(.body)
+                            }
+                        }
+                        .padding(.top, 8)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+//                        .background(Color.white)
+//                        .cornerRadius(8)
+                    }
+                    .padding()
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            
+            // Bottom button
+            VStack(spacing: 0) {
+                Divider()
+                NavigationLink(destination: AppointmentsView()) {
+                    Text("Exit this service")
+                        .font(.headline)
+                        .foregroundColor(Color.black)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(30)
+                }
+                .simultaneousGesture(TapGesture().onEnded {
+                    onDismiss()
+                })
+                .padding()
+            }
+            .background(Color("NHSGrey5"))
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true) // Hide back button on confirmation screen
+        .background(Color("NHSGrey5"))
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: {
+                    onDismiss()
+                }) {
+                    Image(systemName: "xmark")
+                        .accessibilityLabel("Close this form")
+                }
+            }
+        }
+    }
+}
 
 // MARK: - Preview
 #Preview() {
-    AppFlowPreview()
+    VaccinationsView()
 }
