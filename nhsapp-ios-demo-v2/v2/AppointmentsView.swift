@@ -2,14 +2,38 @@ import SwiftUI
 
 struct AppointmentsView: View {
     @State private var showAppointmentsSheet = false
+    @State private var showBookingFlow = false
 
     var body: some View {
         List {
-
             Section {
-                // Custom row that looks like RowLink but opens a sheet
+                // Book an appointment - navigates to embedded flow
+                Button(action: {
+                    showBookingFlow = true
+                }) {
+                    HStack {
+                        Text("Book an appointment")
+                            .foregroundColor(.primary)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(Color.accentColor.opacity(0.7))
+                    }
+                }
+                .buttonStyle(.plain)
+                
+                RowLink(title: "Manage GP appointments") { DetailView(index: 0) }
+                RowLink(title: "Appointment notes and other updates") { DetailView(index: 0) }
+                
+                // Request a letter - now opens sheet
                 HStack {
-                    Text("Book an appointment")
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Request a letter or information")
+                        Text("Provided using Accurx")
+                            .font(.subheadline)
+                            .foregroundStyle(.textSecondary)
+                    }
+                    .padding(.vertical, 4)
                     Spacer()
                     Image(systemName: "chevron.right")
                         .font(.system(size: 14, weight: .semibold))
@@ -22,20 +46,6 @@ struct AppointmentsView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityAddTraits(.isButton)
-                
-                RowLink(title: "Manage GP appointments") { DetailView(index: 0) }
-                RowLink(title: "Appointment notes and other updates") { DetailView(index: 0) }
-                RowLink {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Request a letter or information")
-                        Text("Provided using Accurx")
-                            .font(.subheadline)
-                            .foregroundStyle(.textSecondary)
-                    }
-                    .padding(.vertical, 4)
-                } destination: {
-                    DetailView(index: 0)
-                }
             } header: {
                 Text("GP surgery")
             }
@@ -49,17 +59,24 @@ struct AppointmentsView: View {
                 Text("Hospital")
             }
             .rowStyle(.white)
-
         }
         .navigationTitle("Appointments")
         .navigationBarTitleDisplayMode(.large)
-        .sheet(isPresented: $showAppointmentsSheet) {
-            AppointmentsFlowRoot(isPresented: $showAppointmentsSheet)
+        .nhsListStyle()
+        .navigationDestination(isPresented: $showBookingFlow) {
+            BookingEmbeddedStep1View()
+                .environment(\.dismissToRoot, {
+                    showBookingFlow = false
+                })
         }
-
+        .sheet(isPresented: $showAppointmentsSheet) {
+            BookingFlowCoordinator()
+        }
     }
 }
 
 #Preview {
-    AppointmentsView()
+    NavigationStack {
+        AppointmentsView()
+    }
 }
