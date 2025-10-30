@@ -3,6 +3,7 @@ import SwiftUI
 struct PrescriptionsView: View {
     
     @State private var showPrescriptionCard = true
+    @State private var showPrescriptionOrderFlow = false
 
     var body: some View {
         List {
@@ -33,7 +34,7 @@ struct PrescriptionsView: View {
                                 .accessibilityLabel("Dismiss prescription card")
                         }
                         .accessibilityLabel("Dismiss prescription card")
-                        .accessibilityHint("Hides the ‘Ready to collect’ message.")
+                        .accessibilityHint("Hides the 'Ready to collect' message.")
                         
                     }
                     RowLink(title: "View prescription", chevronColor: Color("NHSAppDarkPurple").opacity(0.7)) { DetailView(index: 0) }
@@ -50,7 +51,23 @@ struct PrescriptionsView: View {
                 
                 RowLink(title: "Check the progress of prescriptions") { DetailView(index: 0) }
                 RowLink(title: "Medicines record") { DetailView(index: 0) }
-                RowLink(title: "Request an emergency prescription") { DetailView(index: 0) }
+                
+                // Modified to show full-screen sheet
+                Button(action: {
+                    showPrescriptionOrderFlow = true
+                }) {
+                    HStack {
+                        Text("Request an emergency prescription")
+                            .foregroundColor(.nhsBlack)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(.primary.opacity(0.7))
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                
                 RowLink {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Your chosen pharmacy")
@@ -78,9 +95,14 @@ struct PrescriptionsView: View {
         .navigationTitle("Prescriptions")
         .navigationBarTitleDisplayMode(.large)
         .nhsListStyle()
+        .fullScreenCover(isPresented: $showPrescriptionOrderFlow) {
+            PrescriptionOrderStep1View(isPresented: $showPrescriptionOrderFlow)
+        }
     }
 }
 
 #Preview {
-    PrescriptionsView()
+    NavigationStack {
+        PrescriptionsView()
+    }
 }
