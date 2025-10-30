@@ -762,7 +762,7 @@ struct EditMedicinesSheet: View {
                         
                         Text("Select the medicines you need for your repeat prescription.")
                             .font(.body)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.nhsGrey1)
                             .padding(.horizontal)
                             .padding(.top, 8)
                         
@@ -800,7 +800,7 @@ struct EditMedicinesSheet: View {
                                 .padding()
                             }
                             .buttonStyle(.plain)
-                            .background(Color.white)
+                            .background(Color.nhsWhite)
                             
                             Divider()
                                 .padding(.horizontal)
@@ -843,7 +843,7 @@ struct EditMedicinesSheet: View {
                                     .padding()
                                 }
                                 .buttonStyle(.plain)
-                                .background(Color.white)
+                                .background(Color.nhsWhite)
                                 
                                 if option != MedicineOption.allCases.last {
                                     Divider()
@@ -913,12 +913,12 @@ struct EditInformationSheet: View {
                         
                         Text("Please provide any additional information about your prescription request (optional).")
                             .font(.body)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.nhsGrey1)
                         
                         TextEditor(text: $additionalInformation)
                             .frame(minHeight: 150)
                             .padding(16)
-                            .background(Color.white)
+                            .background(Color.nhsWhite)
                             .cornerRadius(30)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 30)
@@ -1005,22 +1005,22 @@ struct PrescriptionOrderStep6View: View {
                         VStack(alignment: .leading, spacing: 12) {
                             VStack(alignment: .leading, spacing: 12) {
                                 Text("Your request details")
-                                    .font(.body)
-                                    .foregroundColor(Color.nhsGrey1)
+                                    .font(.title3)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(Color.nhsBlack)
                                 
                                 VStack(alignment: .leading, spacing: 4) {
+                                    Text("Your chosen pharmacy")
+                                        .font(.subheadline)
+                                        .foregroundColor(Color.nhsGrey1)
                                     Text(flowData.selectedPharmacy.name)
                                         .font(.body)
-                                        .bold()
-                                    Text("Pharmacy")
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
                                 }
                                 
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text("Medicines")
                                         .font(.subheadline)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(Color.nhsGrey1)
                                     VStack(alignment: .leading, spacing: 2) {
                                         ForEach(Array(flowData.selectedMedicines).sorted(by: { $0.name < $1.name }), id: \.self) { medicine in
                                             Text(medicine.name)
