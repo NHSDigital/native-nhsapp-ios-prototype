@@ -3,22 +3,12 @@ import SwiftUI
 // MARK: - Flow Data Model
 @Observable
 class PrescriptionFlowData {
-    var selectedPrescriptionType: String = ""
-    var selectedPharmacy: String = ""
+    var selectedPharmacy: PharmacyOption = .wellcare
+    var selectedMedicines: Set<MedicineOption> = []
     var additionalInformation: String = ""
-    var selectedContactNumber: String = ""
 }
 
 // MARK: - Supporting Types
-enum PrescriptionType: String, CaseIterable, Identifiable {
-    case emergency = "Emergency prescription"
-    case urgent = "Urgent prescription (within 24 hours)"
-    case repeatPrescription = "Repeat prescription"
-    
-    var id: String { rawValue }
-    var title: String { rawValue }
-}
-
 enum PharmacyOption: String, CaseIterable, Identifiable {
     case wellcare = "Wellcare Pharmacy"
     case boots = "Boots Pharmacy"
@@ -35,18 +25,18 @@ enum PharmacyOption: String, CaseIterable, Identifiable {
     }
 }
 
-enum ContactNumberOption: String, CaseIterable, Identifiable {
-    case mobile = "Mobile"
-    case home = "Home"
-    case work = "Work"
+enum MedicineOption: String, CaseIterable, Identifiable {
+    case paracetamol = "Paracetamol"
+    case ibuprofen = "Ibuprofen"
+    case amoxicillin = "Amoxicillin"
     
     var id: String { rawValue }
-    var label: String { rawValue }
-    var number: String {
+    var name: String { rawValue }
+    var details: String {
         switch self {
-        case .mobile: return "07123 456789"
-        case .home: return "020 1234 5678"
-        case .work: return "020 8765 4321"
+        case .paracetamol: return "500mg tablets • 100 tablets"
+        case .ibuprofen: return "200mg tablets • 84 tablets"
+        case .amoxicillin: return "250mg capsules • 21 capsules"
         }
     }
 }
@@ -135,109 +125,18 @@ struct PrescriptionOrderStep1ContentView: View {
     }
 }
 
-// MARK: - Flow step 2: Select prescription type
+// MARK: - Flow step 2: Current pharmacy with option to change
 struct PrescriptionOrderStep2View: View {
     @State var flowData: PrescriptionFlowData
     @Binding var isPresented: Bool
-    @State private var selectedPrescriptionType: PrescriptionType?
-    @State private var showCloseAlert = false
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            VStack(alignment: .leading, spacing: 0) {
-                Text("Select prescription type")
-                    .font(.title)
-                    .bold()
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.horizontal)
-                    .padding(.top)
-                
-                List {
-                    ForEach(PrescriptionType.allCases) { option in
-                        Button(action: {
-                            selectedPrescriptionType = option
-                        }) {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(option.title)
-                                        .foregroundColor(.nhsBlack)
-                                        .font(.body)
-                                }
-                                
-                                Spacer()
-                                
-                                if selectedPrescriptionType == option {
-                                    Image(systemName: "checkmark")
-                                        .font(.system(size: 16, weight: .semibold))
-                                        .foregroundColor(Color("NHSGreen"))
-                                }
-                            }
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-                .listStyle(.insetGrouped)
-                .scrollContentBackground(.hidden)
-            }
-            
-            VStack(spacing: 0) {
-                NavigationLink(destination: PrescriptionOrderStep3View(flowData: flowData, isPresented: $isPresented)) {
-                    Text("Continue")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(selectedPrescriptionType != nil ? Color.nhsGreen : Color.nhsGreen)
-                        .cornerRadius(30)
-                }
-                .buttonStyle(.plain)
-                .disabled(selectedPrescriptionType == nil)
-                .simultaneousGesture(TapGesture().onEnded {
-                    if let selectedType = selectedPrescriptionType {
-                        flowData.selectedPrescriptionType = selectedType.title
-                    }
-                })
-                .padding()
-            }
-        }
-        .navigationBarTitleDisplayMode(.inline)
-        .background(Color("NHSGrey5"))
-        .environment(flowData)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button(action: {
-                    showCloseAlert = true
-                }) {
-                    Image(systemName: "xmark")
-                        .accessibilityLabel("Close")
-                }
-            }
-        }
-        .alert("Are you sure you want to close this form? Your progress won't be saved.", isPresented: $showCloseAlert) {
-            Button("Continue with form", role: .cancel) { }
-            Button("Exit form", role: .destructive) {
-                print("DEBUG: Setting isPresented to false")
-                isPresented = false
-            }
-        } message: {
-            Text("Your progress will not be saved.")
-        }
-    }
-}
-
-// MARK: - Flow step 3: Select pharmacy
-struct PrescriptionOrderStep3View: View {
-    @State var flowData: PrescriptionFlowData
-    @Binding var isPresented: Bool
-    @State private var selectedPharmacy: PharmacyOption?
+    @State private var showChangePharmacy = false
     @State private var showCloseAlert = false
     
     var body: some View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    Text("Select your pharmacy")
+                    Text("Your pharmacy")
                         .font(.title)
                         .bold()
                         .fixedSize(horizontal: false, vertical: true)
@@ -251,226 +150,41 @@ struct PrescriptionOrderStep3View: View {
                         .padding(.top, 8)
                     
                     VStack(spacing: 0) {
-                        ForEach(PharmacyOption.allCases) { option in
-                            Button(action: {
-                                selectedPharmacy = option
-                            }) {
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text(option.name)
-                                            .foregroundColor(.nhsBlack)
-                                            .font(.body)
-                                        Text(option.address)
-                                            .foregroundColor(.secondary)
-                                            .font(.subheadline)
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    if selectedPharmacy == option {
-                                        Image(systemName: "checkmark")
-                                            .font(.system(size: 16, weight: .semibold))
-                                            .foregroundColor(Color("NHSGreen"))
-                                    }
-                                }
-                                .contentShape(Rectangle())
-                                .padding()
-                            }
-                            .buttonStyle(.plain)
-                            .background(Color.white)
-                            
-                            if option != PharmacyOption.allCases.last {
-                                Divider()
-                                    .padding(.horizontal)
-                            }
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(flowData.selectedPharmacy.name)
+                                .foregroundColor(.nhsBlack)
+                                .font(.body)
+                                .bold()
+                            Text(flowData.selectedPharmacy.address)
+                                .foregroundColor(.secondary)
+                                .font(.subheadline)
                         }
-                    }
-                    .background(Color.white)
-                    .cornerRadius(30)
-                    .padding(.horizontal)
-                    .padding(.top, 20)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            
-            VStack(spacing: 0) {
-                NavigationLink(destination: PrescriptionOrderStep4View(flowData: flowData, isPresented: $isPresented)) {
-                    Text("Continue")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .padding()
-                        .background(selectedPharmacy != nil ? Color.nhsGreen : Color.nhsGreen)
-                        .cornerRadius(30)
-                }
-                .buttonStyle(.plain)
-                .disabled(selectedPharmacy == nil)
-                .simultaneousGesture(TapGesture().onEnded {
-                    if let pharmacy = selectedPharmacy {
-                        flowData.selectedPharmacy = pharmacy.name
-                    }
-                })
-                .padding()
-            }
-        }
-        .navigationBarTitleDisplayMode(.inline)
-        .background(Color("NHSGrey5"))
-        .environment(flowData)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button(action: {
-                    showCloseAlert = true
-                }) {
-                    Image(systemName: "xmark")
-                        .accessibilityLabel("Close")
-                }
-            }
-        }
-        .alert("Are you sure you want to close this form?", isPresented: $showCloseAlert) {
-            Button("Continue with form", role: .cancel) { }
-            Button("Exit form", role: .destructive) {
-                isPresented = false
-            }
-        } message: {
-            Text("Your progress will not be saved.")
-        }
-    }
-}
-
-// MARK: - Flow step 4: Additional information
-struct PrescriptionOrderStep4View: View {
-    @State var flowData: PrescriptionFlowData
-    @Binding var isPresented: Bool
-    @State private var additionalInformation: String = ""
-    @State private var showCloseAlert = false
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    Text("Additional information")
-                        .font(.title)
-                        .bold()
-                        .fixedSize(horizontal: false, vertical: true)
-                    
-                    Text("Please provide details about the medication you need and why this is an emergency request.")
-                        .font(.body)
-                        .foregroundColor(.secondary)
-                    
-                    TextEditor(text: $additionalInformation)
-                        .frame(minHeight: 150)
-                        .padding(16)
                         .background(Color.white)
-                        .cornerRadius(30)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 30)
-                                .stroke(Color.nhsGrey4, lineWidth: 1)
-                        )
-                }
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            
-            VStack(spacing: 0) {
-                NavigationLink(destination: PrescriptionOrderStep5View(flowData: flowData, isPresented: $isPresented)) {
-                    Text("Continue")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(!additionalInformation.isEmpty ? Color.nhsGreen : Color.nhsGreen)
-                        .cornerRadius(30)
-                }
-                .buttonStyle(.plain)
-                .disabled(additionalInformation.isEmpty)
-                .simultaneousGesture(TapGesture().onEnded {
-                    flowData.additionalInformation = additionalInformation
-                })
-                .padding()
-            }
-        }
-        .navigationBarTitleDisplayMode(.inline)
-        .background(Color("NHSGrey5"))
-        .environment(flowData)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button(action: {
-                    showCloseAlert = true
-                }) {
-                    Image(systemName: "xmark")
-                        .accessibilityLabel("Close")
-                }
-            }
-        }
-        .alert("Are you sure you want to close this form?", isPresented: $showCloseAlert) {
-            Button("Continue with form", role: .cancel) { }
-            Button("Exit form", role: .destructive) {
-                isPresented = false
-            }
-        } message: {
-            Text("Your progress will not be saved.")
-        }
-    }
-}
-
-// MARK: - Flow step 5: Select contact number
-struct PrescriptionOrderStep5View: View {
-    @State var flowData: PrescriptionFlowData
-    @Binding var isPresented: Bool
-    @State private var selectedContactNumber: ContactNumberOption?
-    @State private var showCloseAlert = false
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("Select a contact number")
-                        .font(.title)
-                        .bold()
-                        .fixedSize(horizontal: false, vertical: true)
-                        .padding(.horizontal)
-                        .padding(.top)
-                    
-                    Text("We'll call you on this number if we need to contact you about your prescription.")
-                        .font(.body)
-                        .foregroundColor(.secondary)
-                        .padding(.horizontal)
-                        .padding(.top, 8)
-                    
-                    VStack(spacing: 0) {
-                        ForEach(ContactNumberOption.allCases) { option in
-                            Button(action: {
-                                selectedContactNumber = option
-                            }) {
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text(option.label)
-                                            .foregroundColor(.nhsBlack)
-                                            .font(.body)
-                                        Text(option.number)
-                                            .foregroundColor(.secondary)
-                                            .font(.subheadline)
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    if selectedContactNumber == option {
-                                        Image(systemName: "checkmark")
-                                            .font(.system(size: 16, weight: .semibold))
-                                            .foregroundColor(Color("NHSGreen"))
-                                    }
-                                }
-                                .contentShape(Rectangle())
-                                .padding()
+                        
+                        Divider()
+                            .padding(.horizontal)
+                        
+                        Button(action: {
+                            showChangePharmacy = true
+                        }) {
+                            HStack {
+                                Text("Change pharmacy")
+                                    .foregroundColor(.nhsBlue)
+                                    .font(.body)
+                                
+                                Spacer()
+                                
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.nhsBlue)
                             }
-                            .buttonStyle(.plain)
-                            .background(Color.white)
-                            
-                            if option != ContactNumberOption.allCases.last {
-                                Divider()
-                                    .padding(.horizontal)
-                            }
+                            .contentShape(Rectangle())
+                            .padding()
                         }
+                        .buttonStyle(.plain)
+                        .background(Color.white)
                     }
                     .background(Color.white)
                     .cornerRadius(30)
@@ -481,179 +195,8 @@ struct PrescriptionOrderStep5View: View {
             }
             
             VStack(spacing: 0) {
-                NavigationLink(destination: PrescriptionOrderStep6View(flowData: flowData, isPresented: $isPresented)) {
+                NavigationLink(destination: PrescriptionOrderStep3View(flowData: flowData, isPresented: $isPresented)) {
                     Text("Continue")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(selectedContactNumber != nil ? Color.nhsGreen : Color.nhsGreen)
-                        .cornerRadius(30)
-                }
-                .buttonStyle(.plain)
-                .disabled(selectedContactNumber == nil)
-                .simultaneousGesture(TapGesture().onEnded {
-                    if let contact = selectedContactNumber {
-                        flowData.selectedContactNumber = contact.number
-                    }
-                })
-                .padding()
-            }
-        }
-        .navigationBarTitleDisplayMode(.inline)
-        .background(Color("NHSGrey5"))
-        .environment(flowData)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button(action: {
-                    showCloseAlert = true
-                }) {
-                    Image(systemName: "xmark")
-                        .accessibilityLabel("Close")
-                }
-            }
-        }
-        .alert("Are you sure you want to close this form?", isPresented: $showCloseAlert) {
-            Button("Continue with form", role: .cancel) { }
-            Button("Exit form", role: .destructive) {
-                isPresented = false
-            }
-        } message: {
-            Text("Your progress will not be saved.")
-        }
-    }
-}
-
-// MARK: - Flow step 6: Confirm details
-struct PrescriptionOrderStep6View: View {
-    @State var flowData: PrescriptionFlowData
-    @Binding var isPresented: Bool
-    @State private var showEditPrescriptionType = false
-    @State private var showEditPharmacy = false
-    @State private var showEditInformation = false
-    @State private var showEditContactNumber = false
-    @State private var showCloseAlert = false
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    Text("Confirm your request details")
-                        .font(.title)
-                        .bold()
-                        .fixedSize(horizontal: false, vertical: true)
-                    
-                    VStack(alignment: .leading, spacing: 0) {
-                        Button(action: {
-                            showEditPrescriptionType = true
-                        }) {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("Prescription type")
-                                        .font(.body)
-                                        .bold()
-                                        .foregroundColor(.gray)
-                                    Text(flowData.selectedPrescriptionType)
-                                        .font(.body)
-                                        .foregroundColor(.nhsBlack)
-                                }
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(.primary.opacity(0.7))
-                            }
-                            .contentShape(Rectangle())
-                            .padding(.vertical, 12)
-                        }
-                        .buttonStyle(.plain)
-                        
-                        Divider()
-                        
-                        Button(action: {
-                            showEditPharmacy = true
-                        }) {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("Pharmacy")
-                                        .font(.body)
-                                        .bold()
-                                        .foregroundColor(.gray)
-                                    Text(flowData.selectedPharmacy)
-                                        .font(.body)
-                                        .foregroundColor(.nhsBlack)
-                                }
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(.primary.opacity(0.7))
-                            }
-                            .contentShape(Rectangle())
-                            .padding(.vertical, 12)
-                        }
-                        .buttonStyle(.plain)
-                        
-                        Divider()
-                        
-                        Button(action: {
-                            showEditInformation = true
-                        }) {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("Additional information")
-                                        .font(.body)
-                                        .bold()
-                                        .foregroundColor(.gray)
-                                    Text(flowData.additionalInformation)
-                                        .font(.body)
-                                        .foregroundColor(.nhsBlack)
-                                        .lineLimit(2)
-                                }
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(.primary.opacity(0.7))
-                            }
-                            .contentShape(Rectangle())
-                            .padding(.vertical, 12)
-                        }
-                        .buttonStyle(.plain)
-                        
-                        Divider()
-                        
-                        Button(action: {
-                            showEditContactNumber = true
-                        }) {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("Contact number")
-                                        .font(.body)
-                                        .bold()
-                                        .foregroundColor(.gray)
-                                    Text(flowData.selectedContactNumber)
-                                        .font(.body)
-                                        .foregroundColor(.nhsBlack)
-                                }
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(.primary.opacity(0.7))
-                            }
-                            .contentShape(Rectangle())
-                            .padding(.vertical, 12)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                    .padding(.horizontal)
-                    .background(Color.white)
-                    .cornerRadius(30)
-                }
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            
-            VStack(spacing: 0) {
-                NavigationLink(destination: PrescriptionOrderStep7View(flowData: flowData, isPresented: $isPresented)) {
-                    Text("Confirm request")
                         .font(.headline)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
@@ -686,107 +229,14 @@ struct PrescriptionOrderStep6View: View {
         } message: {
             Text("Your progress will not be saved.")
         }
-        .sheet(isPresented: $showEditPrescriptionType) {
-            EditPrescriptionTypeSheet(flowData: flowData, isPresented: $showEditPrescriptionType)
-        }
-        .sheet(isPresented: $showEditPharmacy) {
-            EditPharmacySheet(flowData: flowData, isPresented: $showEditPharmacy)
-        }
-        .sheet(isPresented: $showEditInformation) {
-            EditInformationSheet(flowData: flowData, isPresented: $showEditInformation)
-        }
-        .sheet(isPresented: $showEditContactNumber) {
-            EditContactNumberSheet(flowData: flowData, isPresented: $showEditContactNumber)
+        .sheet(isPresented: $showChangePharmacy) {
+            ChangePharmacySheet(flowData: flowData, isPresented: $showChangePharmacy)
         }
     }
 }
 
-// MARK: - Edit sheets
-
-struct EditPrescriptionTypeSheet: View {
-    @State var flowData: PrescriptionFlowData
-    @Binding var isPresented: Bool
-    @State private var selectedPrescriptionType: PrescriptionType?
-    
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("Select prescription type")
-                        .font(.title)
-                        .bold()
-                        .fixedSize(horizontal: false, vertical: true)
-                        .padding(.horizontal)
-                        .padding(.top)
-                    
-                    List {
-                        ForEach(PrescriptionType.allCases) { option in
-                            Button(action: {
-                                selectedPrescriptionType = option
-                            }) {
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text(option.title)
-                                            .foregroundColor(.nhsBlack)
-                                            .font(.body)
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    if selectedPrescriptionType == option {
-                                        Image(systemName: "checkmark")
-                                            .font(.system(size: 16, weight: .semibold))
-                                            .foregroundColor(Color("NHSGreen"))
-                                    }
-                                }
-                                .contentShape(Rectangle())
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                    .listStyle(.insetGrouped)
-                    .scrollContentBackground(.hidden)
-                }
-                
-                VStack(spacing: 0) {
-                    Button(action: {
-                        if let selectedType = selectedPrescriptionType {
-                            flowData.selectedPrescriptionType = selectedType.title
-                            isPresented = false
-                        }
-                    }) {
-                        Text("Continue")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(selectedPrescriptionType != nil ? Color.nhsGreen : Color.nhsGreen)
-                            .cornerRadius(30)
-                    }
-                    .disabled(selectedPrescriptionType == nil)
-                    .padding()
-                }
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .background(Color("NHSGrey5"))
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: {
-                        isPresented = false
-                    }) {
-                        Image(systemName: "xmark")
-                            .accessibilityLabel("Close")
-                    }
-                }
-            }
-        }
-        .onAppear {
-            selectedPrescriptionType = PrescriptionType.allCases.first { $0.title == flowData.selectedPrescriptionType }
-        }
-    }
-}
-
-struct EditPharmacySheet: View {
+// MARK: - Change Pharmacy Sheet
+struct ChangePharmacySheet: View {
     @State var flowData: PrescriptionFlowData
     @Binding var isPresented: Bool
     @State private var selectedPharmacy: PharmacyOption?
@@ -855,7 +305,7 @@ struct EditPharmacySheet: View {
                 VStack(spacing: 0) {
                     Button(action: {
                         if let pharmacy = selectedPharmacy {
-                            flowData.selectedPharmacy = pharmacy.name
+                            flowData.selectedPharmacy = pharmacy
                             isPresented = false
                         }
                     }) {
@@ -885,11 +335,567 @@ struct EditPharmacySheet: View {
             }
         }
         .onAppear {
-            selectedPharmacy = PharmacyOption.allCases.first { $0.name == flowData.selectedPharmacy }
+            selectedPharmacy = flowData.selectedPharmacy
         }
     }
 }
 
+// MARK: - Flow step 3: Select medicines
+struct PrescriptionOrderStep3View: View {
+    @State var flowData: PrescriptionFlowData
+    @Binding var isPresented: Bool
+    @State private var selectedMedicines: Set<MedicineOption> = []
+    @State private var showCloseAlert = false
+    
+    var allMedicinesSelected: Bool {
+        selectedMedicines.count == MedicineOption.allCases.count
+    }
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Which medicines do you want?")
+                        .font(.title)
+                        .bold()
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.horizontal)
+                        .padding(.top)
+                    
+                    Text("Select the medicines you need for your repeat prescription.")
+                        .font(.body)
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal)
+                        .padding(.top, 8)
+                    
+                    VStack(spacing: 0) {
+                        // Select all option
+                        Button(action: {
+                            if allMedicinesSelected {
+                                selectedMedicines.removeAll()
+                            } else {
+                                selectedMedicines = Set(MedicineOption.allCases)
+                            }
+                        }) {
+                            HStack {
+                                Text("Select all")
+                                    .foregroundColor(.nhsBlack)
+                                    .font(.body)
+                                    .bold()
+                                
+                                Spacer()
+                                
+                                Toggle("", isOn: Binding(
+                                    get: { allMedicinesSelected },
+                                    set: { isOn in
+                                        if isOn {
+                                            selectedMedicines = Set(MedicineOption.allCases)
+                                        } else {
+                                            selectedMedicines.removeAll()
+                                        }
+                                    }
+                                ))
+                                .labelsHidden()
+                                .tint(Color.nhsGreen)
+                            }
+                            .contentShape(Rectangle())
+                            .padding()
+                        }
+                        .buttonStyle(.plain)
+                        .background(Color.white)
+                        
+                        Divider()
+                            .padding(.horizontal)
+                        
+                        // Individual medicines
+                        ForEach(MedicineOption.allCases) { option in
+                            Button(action: {
+                                if selectedMedicines.contains(option) {
+                                    selectedMedicines.remove(option)
+                                } else {
+                                    selectedMedicines.insert(option)
+                                }
+                            }) {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(option.name)
+                                            .foregroundColor(.nhsBlack)
+                                            .font(.body)
+                                        Text(option.details)
+                                            .foregroundColor(.secondary)
+                                            .font(.subheadline)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    Toggle("", isOn: Binding(
+                                        get: { selectedMedicines.contains(option) },
+                                        set: { isOn in
+                                            if isOn {
+                                                selectedMedicines.insert(option)
+                                            } else {
+                                                selectedMedicines.remove(option)
+                                            }
+                                        }
+                                    ))
+                                    .labelsHidden()
+                                    .tint(Color.nhsGreen)
+                                }
+                                .contentShape(Rectangle())
+                                .padding()
+                            }
+                            .buttonStyle(.plain)
+                            .background(Color.white)
+                            
+                            if option != MedicineOption.allCases.last {
+                                Divider()
+                                    .padding(.horizontal)
+                            }
+                        }
+                    }
+                    .background(Color.white)
+                    .cornerRadius(30)
+                    .padding(.horizontal)
+                    .padding(.top, 20)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            
+            VStack(spacing: 0) {
+                NavigationLink(destination: PrescriptionOrderStep4View(flowData: flowData, isPresented: $isPresented)) {
+                    Text("Continue")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(!selectedMedicines.isEmpty ? Color.nhsGreen : Color.nhsGreen)
+                        .cornerRadius(30)
+                }
+                .buttonStyle(.plain)
+                .disabled(selectedMedicines.isEmpty)
+                .simultaneousGesture(TapGesture().onEnded {
+                    flowData.selectedMedicines = selectedMedicines
+                })
+                .padding()
+            }
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .background(Color("NHSGrey5"))
+        .environment(flowData)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: {
+                    showCloseAlert = true
+                }) {
+                    Image(systemName: "xmark")
+                        .accessibilityLabel("Close")
+                }
+            }
+        }
+        .alert("Are you sure you want to close this form?", isPresented: $showCloseAlert) {
+            Button("Continue with form", role: .cancel) { }
+            Button("Exit form", role: .destructive) {
+                isPresented = false
+            }
+        } message: {
+            Text("Your progress will not be saved.")
+        }
+        .onAppear {
+            selectedMedicines = flowData.selectedMedicines
+        }
+    }
+}
+
+// MARK: - Flow step 4: Additional information
+struct PrescriptionOrderStep4View: View {
+    @State var flowData: PrescriptionFlowData
+    @Binding var isPresented: Bool
+    @State private var additionalInformation: String = ""
+    @State private var showCloseAlert = false
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("Additional information")
+                        .font(.title)
+                        .bold()
+                        .fixedSize(horizontal: false, vertical: true)
+                    
+                    Text("Please provide any additional information about your prescription request (optional).")
+                        .font(.body)
+                        .foregroundColor(.secondary)
+                    
+                    TextEditor(text: $additionalInformation)
+                        .frame(minHeight: 150)
+                        .padding(16)
+                        .background(Color.white)
+                        .cornerRadius(30)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 30)
+                                .stroke(Color.nhsGrey4, lineWidth: 1)
+                        )
+                }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            
+            VStack(spacing: 0) {
+                NavigationLink(destination: PrescriptionOrderStep5View(flowData: flowData, isPresented: $isPresented)) {
+                    Text("Continue")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.nhsGreen)
+                        .cornerRadius(30)
+                }
+                .buttonStyle(.plain)
+                .simultaneousGesture(TapGesture().onEnded {
+                    flowData.additionalInformation = additionalInformation
+                })
+                .padding()
+            }
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .background(Color("NHSGrey5"))
+        .environment(flowData)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: {
+                    showCloseAlert = true
+                }) {
+                    Image(systemName: "xmark")
+                        .accessibilityLabel("Close")
+                }
+            }
+        }
+        .alert("Are you sure you want to close this form?", isPresented: $showCloseAlert) {
+            Button("Continue with form", role: .cancel) { }
+            Button("Exit form", role: .destructive) {
+                isPresented = false
+            }
+        } message: {
+            Text("Your progress will not be saved.")
+        }
+        .onAppear {
+            additionalInformation = flowData.additionalInformation
+        }
+    }
+}
+
+// MARK: - Flow step 5: Confirm details
+struct PrescriptionOrderStep5View: View {
+    @State var flowData: PrescriptionFlowData
+    @Binding var isPresented: Bool
+    @State private var showEditPharmacy = false
+    @State private var showEditMedicines = false
+    @State private var showEditInformation = false
+    @State private var showCloseAlert = false
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("Confirm your request details")
+                        .font(.title)
+                        .bold()
+                        .fixedSize(horizontal: false, vertical: true)
+                    
+                    VStack(alignment: .leading, spacing: 0) {
+                        Button(action: {
+                            showEditPharmacy = true
+                        }) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Pharmacy")
+                                        .font(.body)
+                                        .bold()
+                                        .foregroundColor(.gray)
+                                    Text(flowData.selectedPharmacy.name)
+                                        .font(.body)
+                                        .foregroundColor(.nhsBlack)
+                                }
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.primary.opacity(0.7))
+                            }
+                            .contentShape(Rectangle())
+                            .padding(.vertical, 12)
+                        }
+                        .buttonStyle(.plain)
+                        
+                        Divider()
+                        
+                        Button(action: {
+                            showEditMedicines = true
+                        }) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Medicines")
+                                        .font(.body)
+                                        .bold()
+                                        .foregroundColor(.gray)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        ForEach(Array(flowData.selectedMedicines).sorted(by: { $0.name < $1.name }), id: \.self) { medicine in
+                                            Text(medicine.name)
+                                                .font(.body)
+                                                .foregroundColor(.nhsBlack)
+                                        }
+                                    }
+                                }
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.primary.opacity(0.7))
+                            }
+                            .contentShape(Rectangle())
+                            .padding(.vertical, 12)
+                        }
+                        .buttonStyle(.plain)
+                        
+                        if !flowData.additionalInformation.isEmpty {
+                            Divider()
+                            
+                            Button(action: {
+                                showEditInformation = true
+                            }) {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("Additional information")
+                                            .font(.body)
+                                            .bold()
+                                            .foregroundColor(.gray)
+                                        Text(flowData.additionalInformation)
+                                            .font(.body)
+                                            .foregroundColor(.nhsBlack)
+                                            .lineLimit(2)
+                                    }
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(.primary.opacity(0.7))
+                                }
+                                .contentShape(Rectangle())
+                                .padding(.vertical, 12)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.horizontal)
+                    .background(Color.white)
+                    .cornerRadius(30)
+                }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            
+            VStack(spacing: 0) {
+                NavigationLink(destination: PrescriptionOrderStep6View(flowData: flowData, isPresented: $isPresented)) {
+                    Text("Confirm request")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.nhsGreen)
+                        .cornerRadius(30)
+                }
+                .buttonStyle(.plain)
+                .padding()
+            }
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .background(Color("NHSGrey5"))
+        .environment(flowData)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: {
+                    showCloseAlert = true
+                }) {
+                    Image(systemName: "xmark")
+                        .accessibilityLabel("Close")
+                }
+            }
+        }
+        .alert("Are you sure you want to close this form?", isPresented: $showCloseAlert) {
+            Button("Continue with form", role: .cancel) { }
+            Button("Exit form", role: .destructive) {
+                isPresented = false
+            }
+        } message: {
+            Text("Your progress will not be saved.")
+        }
+        .sheet(isPresented: $showEditPharmacy) {
+            ChangePharmacySheet(flowData: flowData, isPresented: $showEditPharmacy)
+        }
+        .sheet(isPresented: $showEditMedicines) {
+            EditMedicinesSheet(flowData: flowData, isPresented: $showEditMedicines)
+        }
+        .sheet(isPresented: $showEditInformation) {
+            EditInformationSheet(flowData: flowData, isPresented: $showEditInformation)
+        }
+    }
+}
+
+// MARK: - Edit Medicines Sheet
+struct EditMedicinesSheet: View {
+    @State var flowData: PrescriptionFlowData
+    @Binding var isPresented: Bool
+    @State private var selectedMedicines: Set<MedicineOption> = []
+    
+    var allMedicinesSelected: Bool {
+        selectedMedicines.count == MedicineOption.allCases.count
+    }
+    
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text("Which medicines do you want?")
+                            .font(.title)
+                            .bold()
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.horizontal)
+                            .padding(.top)
+                        
+                        Text("Select the medicines you need for your repeat prescription.")
+                            .font(.body)
+                            .foregroundColor(.secondary)
+                            .padding(.horizontal)
+                            .padding(.top, 8)
+                        
+                        VStack(spacing: 0) {
+                            // Select all option
+                            Button(action: {
+                                if allMedicinesSelected {
+                                    selectedMedicines.removeAll()
+                                } else {
+                                    selectedMedicines = Set(MedicineOption.allCases)
+                                }
+                            }) {
+                                HStack {
+                                    Text("Select all")
+                                        .foregroundColor(.nhsBlack)
+                                        .font(.body)
+                                        .bold()
+                                    
+                                    Spacer()
+                                    
+                                    Toggle("", isOn: Binding(
+                                        get: { allMedicinesSelected },
+                                        set: { isOn in
+                                            if isOn {
+                                                selectedMedicines = Set(MedicineOption.allCases)
+                                            } else {
+                                                selectedMedicines.removeAll()
+                                            }
+                                        }
+                                    ))
+                                    .labelsHidden()
+                                    .tint(Color.nhsGreen)
+                                }
+                                .contentShape(Rectangle())
+                                .padding()
+                            }
+                            .buttonStyle(.plain)
+                            .background(Color.white)
+                            
+                            Divider()
+                                .padding(.horizontal)
+                            
+                            // Individual medicines
+                            ForEach(MedicineOption.allCases) { option in
+                                Button(action: {
+                                    if selectedMedicines.contains(option) {
+                                        selectedMedicines.remove(option)
+                                    } else {
+                                        selectedMedicines.insert(option)
+                                    }
+                                }) {
+                                    HStack {
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(option.name)
+                                                .foregroundColor(.nhsBlack)
+                                                .font(.body)
+                                            Text(option.details)
+                                                .foregroundColor(.secondary)
+                                                .font(.subheadline)
+                                        }
+                                        
+                                        Spacer()
+                                        
+                                        Toggle("", isOn: Binding(
+                                            get: { selectedMedicines.contains(option) },
+                                            set: { isOn in
+                                                if isOn {
+                                                    selectedMedicines.insert(option)
+                                                } else {
+                                                    selectedMedicines.remove(option)
+                                                }
+                                            }
+                                        ))
+                                        .labelsHidden()
+                                        .tint(Color.nhsGreen)
+                                    }
+                                    .contentShape(Rectangle())
+                                    .padding()
+                                }
+                                .buttonStyle(.plain)
+                                .background(Color.white)
+                                
+                                if option != MedicineOption.allCases.last {
+                                    Divider()
+                                        .padding(.horizontal)
+                                }
+                            }
+                        }
+                        .background(Color.white)
+                        .cornerRadius(30)
+                        .padding(.horizontal)
+                        .padding(.top, 20)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                
+                VStack(spacing: 0) {
+                    Button(action: {
+                        flowData.selectedMedicines = selectedMedicines
+                        isPresented = false
+                    }) {
+                        Text("Continue")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(!selectedMedicines.isEmpty ? Color.nhsGreen : Color.nhsGreen)
+                            .cornerRadius(30)
+                    }
+                    .disabled(selectedMedicines.isEmpty)
+                    .padding()
+                }
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .background(Color("NHSGrey5"))
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: {
+                        isPresented = false
+                    }) {
+                        Image(systemName: "xmark")
+                            .accessibilityLabel("Close")
+                    }
+                }
+            }
+        }
+        .onAppear {
+            selectedMedicines = flowData.selectedMedicines
+        }
+    }
+}
+
+// MARK: - Edit Information Sheet
 struct EditInformationSheet: View {
     @State var flowData: PrescriptionFlowData
     @Binding var isPresented: Bool
@@ -905,7 +911,7 @@ struct EditInformationSheet: View {
                             .bold()
                             .fixedSize(horizontal: false, vertical: true)
                         
-                        Text("Please provide details about the medication you need and why this is an emergency request.")
+                        Text("Please provide any additional information about your prescription request (optional).")
                             .font(.body)
                             .foregroundColor(.secondary)
                         
@@ -933,10 +939,9 @@ struct EditInformationSheet: View {
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(!additionalInformation.isEmpty ? Color.nhsGreen : Color.nhsGreen)
+                            .background(Color.nhsGreen)
                             .cornerRadius(30)
                     }
-                    .disabled(additionalInformation.isEmpty)
                     .padding()
                 }
             }
@@ -959,112 +964,8 @@ struct EditInformationSheet: View {
     }
 }
 
-struct EditContactNumberSheet: View {
-    @State var flowData: PrescriptionFlowData
-    @Binding var isPresented: Bool
-    @State private var selectedContactNumber: ContactNumberOption?
-    
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 0) {
-                        Text("Select a contact number")
-                            .font(.title)
-                            .bold()
-                            .fixedSize(horizontal: false, vertical: true)
-                            .padding(.horizontal)
-                            .padding(.top)
-                        
-                        Text("We'll call you on this number if we need to contact you about your prescription.")
-                            .font(.body)
-                            .foregroundColor(.secondary)
-                            .padding(.horizontal)
-                            .padding(.top, 8)
-                        
-                        VStack(spacing: 0) {
-                            ForEach(ContactNumberOption.allCases) { option in
-                                Button(action: {
-                                    selectedContactNumber = option
-                                }) {
-                                    HStack {
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            Text(option.label)
-                                                .foregroundColor(.nhsBlack)
-                                                .font(.body)
-                                            Text(option.number)
-                                                .foregroundColor(.secondary)
-                                                .font(.subheadline)
-                                        }
-                                        
-                                        Spacer()
-                                        
-                                        if selectedContactNumber == option {
-                                            Image(systemName: "checkmark")
-                                                .font(.system(size: 16, weight: .semibold))
-                                                .foregroundColor(Color("NHSGreen"))
-                                        }
-                                    }
-                                    .contentShape(Rectangle())
-                                    .padding()
-                                }
-                                .buttonStyle(.plain)
-                                .background(Color.white)
-                                
-                                if option != ContactNumberOption.allCases.last {
-                                    Divider()
-                                        .padding(.horizontal)
-                                }
-                            }
-                        }
-                        .background(Color.white)
-                        .cornerRadius(30)
-                        .padding(.horizontal)
-                        .padding(.top, 20)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                
-                VStack(spacing: 0) {
-                    Button(action: {
-                        if let contact = selectedContactNumber {
-                            flowData.selectedContactNumber = contact.number
-                            isPresented = false
-                        }
-                    }) {
-                        Text("Continue")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(selectedContactNumber != nil ? Color.nhsGreen : Color.nhsGreen)
-                            .cornerRadius(30)
-                    }
-                    .disabled(selectedContactNumber == nil)
-                    .padding()
-                }
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .background(Color("NHSGrey5"))
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: {
-                        isPresented = false
-                    }) {
-                        Image(systemName: "xmark")
-                            .accessibilityLabel("Close")
-                    }
-                }
-            }
-        }
-        .onAppear {
-            selectedContactNumber = ContactNumberOption.allCases.first { $0.number == flowData.selectedContactNumber }
-        }
-    }
-}
-
-// MARK: - Flow step 7: Request confirmed
-struct PrescriptionOrderStep7View: View {
+// MARK: - Flow step 6: Request confirmed
+struct PrescriptionOrderStep6View: View {
     @State var flowData: PrescriptionFlowData
     @Binding var isPresented: Bool
     
@@ -1095,7 +996,7 @@ struct PrescriptionOrderStep7View: View {
                                 .font(.title3)
                                 .bold()
                             
-                            Text("YYour request has been sent to your GP surgery for approval. Once approved, it can take 3 to 5 working days for a pharmacy to prepare your prescription.")
+                            Text("Your request has been sent to your GP surgery for approval. Once approved, it can take 3 to 5 working days for a pharmacy to prepare your prescription.")
                                 .font(.body)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -1107,12 +1008,8 @@ struct PrescriptionOrderStep7View: View {
                                     .font(.body)
                                     .foregroundColor(Color.nhsGrey1)
                                 
-                                Text(flowData.selectedPrescriptionType)
-                                    .font(.body)
-                                    .bold()
-                                
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text(flowData.selectedPharmacy)
+                                    Text(flowData.selectedPharmacy.name)
                                         .font(.body)
                                         .bold()
                                     Text("Pharmacy")
@@ -1121,11 +1018,15 @@ struct PrescriptionOrderStep7View: View {
                                 }
                                 
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text("Contact number")
+                                    Text("Medicines")
                                         .font(.subheadline)
                                         .foregroundColor(.secondary)
-                                    Text(flowData.selectedContactNumber)
-                                        .font(.body)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        ForEach(Array(flowData.selectedMedicines).sorted(by: { $0.name < $1.name }), id: \.self) { medicine in
+                                            Text(medicine.name)
+                                                .font(.body)
+                                        }
+                                    }
                                 }
                             }
                             .padding(.horizontal)
