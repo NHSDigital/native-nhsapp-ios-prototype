@@ -899,7 +899,9 @@ struct BookingStep7View: View {
                                     .foregroundColor(.nhsBlue)
                                     .frame(maxWidth: .infinity)
                                     .padding()
-                                    .background(Color.nhsWhite, in: RoundedRectangle(cornerRadius: 30))
+                                    .background(.clear)
+                                    .overlay(RoundedRectangle(cornerRadius: 30).stroke(Color.nhsGrey3, lineWidth: 1))
+
                             }
                             .padding(.horizontal)
                             .padding(.top, 8)
@@ -907,9 +909,9 @@ struct BookingStep7View: View {
                         }
                         .padding(.top, 8)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(.clear)
+                        .background(Color.nhsWhite)
                         .cornerRadius(30)
-                        .overlay(RoundedRectangle(cornerRadius: 30).stroke(Color.nhsGrey3, lineWidth: 1))
+//                        .overlay(RoundedRectangle(cornerRadius: 30).stroke(Color.nhsGrey3, lineWidth: 1))
 
                     }
                     .padding()
