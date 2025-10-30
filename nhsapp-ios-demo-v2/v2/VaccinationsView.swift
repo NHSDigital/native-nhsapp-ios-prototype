@@ -829,16 +829,17 @@ struct BookingStep7View: View {
                             Text("Appointment confirmed")
                                 .font(.largeTitle)
                                 .bold()
-                                .foregroundColor(.white)
+                                .foregroundColor(.nhsGreen)
                             Spacer()
                         }
                         .padding(.horizontal)
                         .padding(.vertical)
-                        .background(Color.nhsGreen)
+                        .background(Color.nhsAppPaleGreen)
                         .cornerRadius(30)
                     }
                     .padding(.horizontal)
-                    .padding(.bottom, 16)
+                    .padding(.bottom, 14)
+                    .padding(.top, 16)
 
                     
                     // Main content area
@@ -894,14 +895,11 @@ struct BookingStep7View: View {
                                 // Add to calendar action
                             }) {
                                 Text("Add to your calendar")
-                                    .font(.headline)
-                                    .foregroundColor(Color.nhsBlue)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.nhsBlue)
                                     .frame(maxWidth: .infinity)
                                     .padding()
-                                    .background(.clear)
-                                    .cornerRadius(30)
-                                    .overlay(RoundedRectangle(cornerRadius: 30).stroke(Color.nhsBlue, lineWidth: 1))
-
+                                    .background(Color.nhsWhite, in: RoundedRectangle(cornerRadius: 30))
                             }
                             .padding(.horizontal)
                             .padding(.top, 8)
@@ -909,32 +907,15 @@ struct BookingStep7View: View {
                         }
                         .padding(.top, 8)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color.white)
+                        .background(.clear)
                         .cornerRadius(30)
+                        .overlay(RoundedRectangle(cornerRadius: 30).stroke(Color.nhsGrey3, lineWidth: 1))
+
                     }
                     .padding()
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
-            
-            // Bottom button
-            VStack(spacing: 0) {
-//                Divider()
-                NavigationLink(destination: AppointmentsView()) {
-                    Text("Exit this service")
-                        .font(.body)
-                        .foregroundColor(Color.black)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-//                        .background(Color.white)
-                        .cornerRadius(30)
-                }
-                .simultaneousGesture(TapGesture().onEnded {
-                    onDismiss()
-                })
-                .padding()
-            }
-//            .background(Color("NHSGrey5"))
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true) // Hide back button on confirmation screen
@@ -944,9 +925,11 @@ struct BookingStep7View: View {
                 Button(action: {
                     onDismiss()
                 }) {
-                    Image(systemName: "xmark")
-                        .accessibilityLabel("Close this form")
+                    Text("Done")
+                        .fontWeight(.semibold)
                 }
+                .buttonStyle(.borderedProminent)
+                .tint(.nhsGreen)
             }
         }
     }
@@ -956,3 +939,21 @@ struct BookingStep7View: View {
 #Preview() {
     VaccinationsView()
 }
+
+
+//#Preview() {
+//    // Preview showing just the final confirmation screen
+//    NavigationStack {
+//        BookingStep7View(
+//            flowData: {
+//                let data = BookingFlowData()
+//                data.selectedAppointmentType = "General GP appointment"
+//                data.selectedDateTime = Date()
+//                data.appointmentReason = "Annual checkup"
+//                data.selectedPhoneNumber = "07123 456789"
+//                return data
+//            }(),
+//            onDismiss: {}
+//        )
+//    }
+//}
