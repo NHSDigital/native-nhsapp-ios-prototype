@@ -994,6 +994,8 @@ struct PrescriptionOrderStep6View: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.bottom, 8)
                         
+                        Divider()
+                        
                         VStack(alignment: .leading, spacing: 12) {
                             VStack(alignment: .leading, spacing: 12) {
                                 Text("Your request details")
@@ -1021,14 +1023,43 @@ struct PrescriptionOrderStep6View: View {
                                     }
                                 }
                             }
-                            .padding(.horizontal)
-                            .padding(.top, 8)
-                            .padding(.bottom, 16)
                         }
-                        .padding(.top, 8)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color.white)
+                        .padding(.top, 4)
+                        .padding(.bottom, 4)
+                        
+                        VStack(spacing: 0) {
+                            NavigationLink(destination: DetailView(index: 0)) {
+                                HStack(spacing: 10) {
+                                    Text("View your prescription requests")
+                                        .foregroundColor(Color.nhsBlack)
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(Color.nhsBlue.opacity(0.7))
+                                }
+                                .padding(.horizontal)
+                                .padding(.vertical)
+                            }
+                            
+                            Divider()
+                                .padding(.horizontal)
+                            
+                            HStack(spacing: 10) {
+                                Text("Get help with the Medicines A to Z")
+                                    .foregroundColor(Color.nhsBlack)
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(Color.nhsBlue.opacity(0.7))
+                            }
+                            .padding(.horizontal)
+                            .padding(.vertical)
+                            
+                        }
+                        .background(Color.nhsWhite)
                         .cornerRadius(30)
+                        
                     }
                     .padding()
                 }
@@ -1058,3 +1089,14 @@ struct PrescriptionOrderStep6View: View {
 #Preview {
     PrescriptionsView()
 }
+
+//#Preview("Confirmation Step") {
+//    @Previewable @State var isPresented = true
+//    
+//    let sampleFlowData = PrescriptionFlowData()
+//    sampleFlowData.selectedPharmacy = .wellcare
+//    sampleFlowData.selectedMedicines = [.paracetamol, .ibuprofen]
+//    sampleFlowData.additionalInformation = "Please contact me if there are any issues with this prescription."
+//    
+//    return PrescriptionOrderStep6View(flowData: sampleFlowData, isPresented: $isPresented)
+//}
