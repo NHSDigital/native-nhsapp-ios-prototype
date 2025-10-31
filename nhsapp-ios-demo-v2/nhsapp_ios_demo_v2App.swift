@@ -17,7 +17,7 @@ struct NHSApp_iOS_Demo_v2App: App {
                     .transition(.opacity)
                 } else {
                     // Edit this to change the nav for the different versions
-                    HomeView()
+                    MainTabView()  // ← Changed from HomeView()
                         .transition(.opacity)
                 }
             }
