@@ -194,18 +194,19 @@ struct HomeView: View {
                                 Image(systemName: "pills.fill")
                                     .font(.system(size: 16))
                                     .foregroundColor(Color(.white))
+                                    .frame(width: 20, height: 20)
                                     .padding(10)
                                     .background(Color("NHSPurple"))
                                     .clipShape(Circle())
                                 
                                 Text("Prescriptions")
-                                    .foregroundColor(.primary)
+                                    .foregroundColor(Color.nhsBlack)
                                 
                                 Spacer()
                                 
                                 Image(systemName: "chevron.right")
                                     .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(Color.nhsBlue.opacity(0.7))
                             }
                             .padding(.leading, 10)
                             .padding(.trailing, 16)
@@ -221,18 +222,19 @@ struct HomeView: View {
                                 Image(systemName: "calendar.badge.clock")
                                     .font(.system(size: 16))
                                     .foregroundColor(.white)
+                                    .frame(width: 20, height: 20)
                                     .padding(10)
                                     .background(Color("NHSBlue"))
                                     .clipShape(Circle())
                                 
                                 Text("Appointments")
-                                    .foregroundColor(.primary)
+                                    .foregroundColor(Color.nhsBlack)
                                 
                                 Spacer()
                                 
                                 Image(systemName: "chevron.right")
                                     .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(Color.nhsBlue.opacity(0.7))
                             }
                             .padding(.leading, 10)
                             .padding(.trailing, 16)
@@ -248,18 +250,19 @@ struct HomeView: View {
                                 Image(systemName: "waveform.path.ecg")
                                     .font(.system(size: 16))
                                     .foregroundColor(.white)
+                                    .frame(width: 20, height: 20)
                                     .padding(10)
                                     .background(Color("NHSPink"))
                                     .clipShape(Circle())
                                 
                                 Text("Test results")
-                                    .foregroundColor(.primary)
+                                    .foregroundColor(Color.nhsBlack)
                                 
                                 Spacer()
                                 
                                 Image(systemName: "chevron.right")
                                     .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(Color.nhsBlue.opacity(0.7))
                             }
                             .padding(.leading, 10)
                             .padding(.trailing, 16)
@@ -275,18 +278,19 @@ struct HomeView: View {
                                 Image(systemName: "syringe")
                                     .font(.system(size: 16))
                                     .foregroundColor(.white)
+                                    .frame(width: 20, height: 20)
                                     .padding(10)
                                     .background(Color("NHSOrange"))
                                     .clipShape(Circle())
                                 
                                 Text("Vaccinations")
-                                    .foregroundColor(.primary)
+                                    .foregroundColor(Color.nhsBlack)
                                 
                                 Spacer()
                                 
                                 Image(systemName: "chevron.right")
                                     .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(Color.nhsBlue.opacity(0.7))
                             }
                             .padding(.leading, 10)
                             .padding(.trailing, 16)
@@ -302,18 +306,19 @@ struct HomeView: View {
                                 Image(systemName: "cross.case.fill")
                                     .font(.system(size: 16))
                                     .foregroundColor(.white)
+                                    .frame(width: 20, height: 20)
                                     .padding(10)
                                     .background(Color("NHSGreen"))
                                     .clipShape(Circle())
                                 
                                 Text("Health conditions")
-                                    .foregroundColor(.primary)
+                                    .foregroundColor(Color.nhsBlack)
                                 
                                 Spacer()
                                 
                                 Image(systemName: "chevron.right")
                                     .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(Color.nhsBlue.opacity(0.7))
                             }
                             .padding(.leading, 10)
                             .padding(.trailing, 16)
@@ -329,18 +334,19 @@ struct HomeView: View {
                                 Image(systemName: "doc.text.fill")
                                     .font(.system(size: 16))
                                     .foregroundColor(.white)
+                                    .frame(width: 20, height: 20)
                                     .padding(10)
                                     .background(Color("NHSRed"))
                                     .clipShape(Circle())
                                 
                                 Text("Documents")
-                                    .foregroundColor(.primary)
+                                    .foregroundColor(Color.nhsBlack)
                                 
                                 Spacer()
                                 
                                 Image(systemName: "chevron.right")
                                     .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(Color.nhsBlue.opacity(0.7))
                             }
                             .padding(.leading, 10)
                             .padding(.trailing, 16)
@@ -390,8 +396,8 @@ struct HomeView: View {
                             .padding(.vertical, 16)
                         }
                         .background(.clear)
-                        .overlay(RoundedRectangle(cornerRadius: 30).stroke(Color.nhsGrey3, lineWidth: 1))
-                        .cornerRadius(30)
+                        .overlay(RoundedRectangle(cornerRadius: 28).stroke(Color.nhsGrey3, lineWidth: 1))
+                        .cornerRadius(28)
                         .padding(.horizontal, 16)
                     }
                     
@@ -409,12 +415,10 @@ struct HomeView: View {
                             DetailView(index: 0)
                         }
                         .padding(.top, 20)
-
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
                     .padding(.bottom, 32)
-
                 }
             }
             .ignoresSafeArea(edges: .top)
