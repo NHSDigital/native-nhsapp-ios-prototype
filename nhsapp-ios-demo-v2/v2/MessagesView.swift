@@ -55,17 +55,17 @@ let sampleMessages: [Message] = [
               content: "Dear Patient,\n\nYour annual flu vaccination is now due. Protect yourself and others this winter by booking your appointment today.\n\nYou can book via the NHS App or contact Range Surgery directly.\n\nThank you,\nRange Surgery"),
 
         .init(sender: "Range Surgery",
-              preview: "We noticed you haven’t completed your blood pressure check. Please submit your latest reading using our online form.",
+              preview: "We noticed you haven't completed your blood pressure check. Please submit your latest reading using our online form.",
               date: Calendar.current.date(byAdding: .day, value: -4, to: .now)!,
               isRead: true,
-              content: "Dear Patient,\n\nWe noticed you haven’t completed your blood pressure check yet.\n\nPlease submit your latest reading using our online form or by visiting the practice.\n\nRegular monitoring helps us keep your care up to date.\n\nKind regards,\nRange Surgery"),
+              content: "Dear Patient,\n\nWe noticed you haven't completed your blood pressure check yet.\n\nPlease submit your latest reading using our online form or by visiting the practice.\n\nRegular monitoring helps us keep your care up to date.\n\nKind regards,\nRange Surgery"),
 
         .init(sender: "NHS Digital",
               preview: "Important update: Changes to how your health information is stored and shared. Please review the new data sharing policy.",
               date: Calendar.current.date(byAdding: .day, value: -9, to: .now)!,
               isRead: true,
               isFlagged: true,
-              content: "Dear Patient,\n\nWe’ve made important updates to how your health information is securely stored and shared within the NHS.\n\nPlease review the new data sharing policy in the NHS App or visit the NHS Digital website for details.\n\nThank you,\nNHS Digital"),
+              content: "Dear Patient,\n\nWe've made important updates to how your health information is securely stored and shared within the NHS.\n\nPlease review the new data sharing policy in the NHS App or visit the NHS Digital website for details.\n\nThank you,\nNHS Digital"),
 
         .init(sender: "Riverside Surgery",
               preview: "Appointment reminder: You have a blood test booked for Monday 21 October at 9:15 AM.",
@@ -229,29 +229,46 @@ private struct MessageDetailView: View {
             Color.pageBackground.ignoresSafeArea()
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 16) {
+                    // Sender name in body
+                    Text(message.sender)
+                        .font(.title2)
+                        .bold()
+                    
+                    // Date received
+                    Text(messageDetailDateString(for: message.date))
+                        .font(.subheadline)
+                        .foregroundStyle(.textSecondary)
 
                     if currentMessage.isFlagged {
-                        Image(systemName: "flag.fill")
-                            .imageScale(.small)
-                            .foregroundStyle(.warning)
+                        HStack {
+                            Image(systemName: "flag.fill")
+                                .imageScale(.small)
+                                .foregroundStyle(.warning)
+                            Text("Flagged")
+                                .font(.subheadline)
+                                .foregroundStyle(.warning)
+                        }
                     }
 
+                    Divider()
+                        .padding(.vertical, 4)
+
                     Text(message.content.isEmpty ? message.preview : message.content)
-                        .padding(.top, 16)
+                        .font(.body)
 
                     Spacer(minLength: 0)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
-                .padding(.vertical)
+                .padding(.vertical, 24)
             }
             .scrollIndicators(.hidden)
         }
-        .navigationTitle(message.sender)
-        .navigationSubtitle(messageDetailDateString(for: message.date))
+        .navigationTitle("Message")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem {
+            ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     if let index = messageStore.messages.firstIndex(where: { $0.id == message.id }) {
                         messageStore.messages[index].isFlagged.toggle()
@@ -264,7 +281,7 @@ private struct MessageDetailView: View {
                     }
                 }
             }
-            ToolbarItem {
+            ToolbarItem(placement: .topBarTrailing) {
                 Button(role: .destructive) {
                     showingRemoveAlert = true
                 } label: {
@@ -348,27 +365,34 @@ private struct RemovedMessageDetailView: View {
             Color.pageBackground.ignoresSafeArea()
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 16) {
+                    // Sender name in body
+                    Text(message.sender)
+                        .font(.title2)
+                        .bold()
+                    
                     Text(messageDetailDateString(for: message.date))
                         .font(.subheadline)
                         .foregroundStyle(.textSecondary)
-                        .padding(.bottom, 16)
-                        .padding(.top, -16)
+
+                    Divider()
+                        .padding(.vertical, 4)
 
                     Text(message.content.isEmpty ? message.preview : message.content)
+                        .font(.body)
 
                     Spacer(minLength: 0)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
-                .padding(.vertical)
+                .padding(.vertical, 24)
             }
             .scrollIndicators(.hidden)
         }
-        .navigationTitle(message.sender)
-        .navigationBarTitleDisplayMode(.large)
+        .navigationTitle("Message")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem {
+            ToolbarItem(placement: .topBarTrailing) {
                 Button("Restore") {
                     messageStore.restoreMessage(message)
                     dismiss()
@@ -469,7 +493,8 @@ struct MessagesView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        // REMOVED NavigationStack - HomeView already has one
+        Group {
             if messageStore.messages.isEmpty {
                 
                 List {
@@ -623,7 +648,7 @@ struct MessagesView: View {
         if searchText.isEmpty {
             return "No \(filter.rawValue.lowercased()) messages"
         } else {
-            return "No results for “\(searchText)” in \(filter.rawValue.lowercased())"
+            return "No results for \"\(searchText)\" in \(filter.rawValue.lowercased())"
         }
     }
 
@@ -665,6 +690,8 @@ struct MessagesView: View {
 
 
 #Preview {
-    MessagesView()
-        .environmentObject(MessageStore())
+    NavigationStack {
+        MessagesView()
+            .environmentObject(MessageStore())
+    }
 }

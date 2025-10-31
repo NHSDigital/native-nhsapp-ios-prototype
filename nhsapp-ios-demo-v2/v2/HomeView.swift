@@ -44,7 +44,7 @@ struct HomeView: View {
             switch self {
             case .self_: return Color("NHSBlue")
             case .spouse: return Color("NHSPurple")
-            case .child: return Color("NHSOrange")
+            case .child: return Color("NHSGreen")
             }
         }
         
@@ -62,6 +62,7 @@ struct HomeView: View {
     @State private var showProfileSheet = false
     @State private var activeProfile: ProfileOption = .self_
     @State private var tempSelectedProfile: ProfileOption = .self_
+    @EnvironmentObject var messageStore: MessageStore
 
     
     var body: some View {
@@ -80,9 +81,7 @@ struct HomeView: View {
                             Spacer()
                             
                             // Messages button with badge
-                            Button(action: {
-                                // Handle messages action
-                            }) {
+                            NavigationLink(destination: MessagesView().environmentObject(messageStore)) {
                                 ZStack(alignment: .topTrailing) {
                                     Image(systemName: "envelope.fill")
                                         .font(.system(size: 20))
@@ -128,10 +127,29 @@ struct HomeView: View {
                             }) {
                                 HStack(spacing: 6) {
                                     Image(systemName: "arrow.triangle.2.circlepath")
-                                        .font(.system(size: 14)) // smaller icon
+                                        .font(.system(size: 16))
                                         .bold()
                                         .accessibilityHidden(true)
-                                    Text("Manage your profile")
+                                    Text("Switch profiles")
+                                        .font(.subheadline)
+                                        .bold()
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 10)
+                                .background(Color.clear)
+                                .overlay(RoundedRectangle(cornerRadius: 30).stroke(Color.white.opacity(0.5), lineWidth: 1.5))
+                                    .foregroundColor(.textInverseOnly)
+                                .clipShape(Capsule())
+                            }
+                            .padding(.top, 10)
+                            
+                            NavigationLink(destination: ProfileView()) {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "person.crop.circle")
+                                        .font(.system(size: 16))
+                                        .bold()
+                                        .accessibilityHidden(true)
+                                    Text("Profile")
                                         .font(.subheadline)
                                         .bold()
                                 }
@@ -524,4 +542,7 @@ struct ProfileManagementSheet: View {
     }
 }
 
-#Preview { HomeView() }
+#Preview {
+    HomeView()
+        .environmentObject(MessageStore())
+}
