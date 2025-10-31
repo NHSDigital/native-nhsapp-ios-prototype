@@ -11,22 +11,29 @@ struct ProfileView: View {
                 Section {
                     HStack(alignment: .center) {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(profile.name)
-                                .font(.title2)
-                                .bold()
+                            VStack(alignment: .leading){
+                                Text("Acting for:")
+                                    .font(.body)
+                                    .bold()
+                                Text(profile.name)
+                                    .font(.title2)
+                                    .bold()
+                            }
+                            .padding(.bottom, 10)
+                               
                             Text("Date of birth: 15 March 1984")
                                 .font(.subheadline)
                             Text("NHS number: \(profile.nhsNumber)")
                                 .font(.subheadline)
                         }
+                        .foregroundColor(Color.nhsWhite)
                     }
-                    .padding(.vertical, 4)
+                    .padding(.top, 4)
+                    .padding(.bottom, 8)
+                    .padding(.horizontal, 8)
                     
-                    RowLink(title: "Manage health services for others") {
-                            DetailView(index: 6)
-                        }
-    
                 }
+                .listRowBackground(profile.backgroundColor)
                 .rowStyle(.white)
                 
                 Section {
