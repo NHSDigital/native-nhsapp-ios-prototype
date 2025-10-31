@@ -11,15 +11,22 @@ struct ProfileView: View {
                 Section {
                     HStack(alignment: .center) {
                         VStack(alignment: .leading, spacing: 4) {
-                            VStack(alignment: .leading){
-                                Text("Acting for:")
-                                    .font(.body)
-                                    .bold()
+                            if profile != .self_ {
+                                VStack(alignment: .leading){
+                                    Text("Acting for:")
+                                        .font(.body)
+                                        .bold()
+                                    Text(profile.name)
+                                        .font(.title2)
+                                        .bold()
+                                }
+                                .padding(.bottom, 10)
+                            } else {
                                 Text(profile.name)
                                     .font(.title2)
                                     .bold()
+                                    .padding(.bottom, 10)
                             }
-                            .padding(.bottom, 10)
                                
                             Text("Date of birth: 15 March 1984")
                                 .font(.subheadline)

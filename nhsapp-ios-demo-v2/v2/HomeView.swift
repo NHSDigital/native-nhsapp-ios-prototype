@@ -430,7 +430,7 @@ struct ProfileManagementSheet: View {
                                 HStack {
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text(option.name)
-                                            .foregroundColor(.primary)
+                                            .foregroundColor(Color.nhsBlack)
                                             .font(.body)
                                         
                                         Text(option.rawValue)
