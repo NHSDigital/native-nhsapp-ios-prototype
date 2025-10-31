@@ -249,6 +249,5 @@ struct HomeView: View {
     }
 }
 
-#Preview {
-    HomeView()
-}
+#Preview { MainTabView() }
+
