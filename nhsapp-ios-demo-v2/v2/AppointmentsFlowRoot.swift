@@ -22,5 +22,5 @@ struct AppointmentsFlowRoot: View {
 }
 
 #Preview {
-    AppointmentsView()
+    AppointmentsView(activeProfile: .self_)
 }

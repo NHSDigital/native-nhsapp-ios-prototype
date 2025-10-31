@@ -140,7 +140,7 @@ struct HomeView: View {
                     
 // MARK: - Navigation links section
                     VStack(spacing: 0) {
-                        NavigationLink(destination: PrescriptionsView()) {
+                        NavigationLink(destination: PrescriptionsView(activeProfile: activeProfile)) {
                             HStack(spacing: 10) {
                                 Image(systemName: "pills.fill")
                                     .font(.system(size: 16))
@@ -168,7 +168,7 @@ struct HomeView: View {
                             .padding(.leading, 62)
                             .padding(.trailing, 16)
                         
-                        NavigationLink(destination: AppointmentsView()) {
+                        NavigationLink(destination: AppointmentsView(activeProfile: activeProfile)) {
                             HStack(spacing: 10) {
                                 Image(systemName: "calendar.badge.clock")
                                     .font(.system(size: 16))
@@ -196,7 +196,7 @@ struct HomeView: View {
                             .padding(.leading, 62)
                             .padding(.trailing, 16)
                         
-                        NavigationLink(destination: TestResultsView()) {
+                        NavigationLink(destination: TestResultsView(activeProfile: activeProfile)) {
                             HStack(spacing: 10) {
                                 Image(systemName: "waveform.path.ecg")
                                     .font(.system(size: 16))
@@ -224,7 +224,7 @@ struct HomeView: View {
                             .padding(.leading, 62)
                             .padding(.trailing, 16)
                         
-                        NavigationLink(destination: VaccinationsView()) {
+                        NavigationLink(destination: VaccinationsView(activeProfile: activeProfile)) {
                             HStack(spacing: 10) {
                                 Image(systemName: "syringe")
                                     .font(.system(size: 16))
@@ -252,7 +252,7 @@ struct HomeView: View {
                             .padding(.leading, 62)
                             .padding(.trailing, 16)
                         
-                        NavigationLink(destination: HealthConditionsView()) {
+                        NavigationLink(destination: HealthConditionsView(activeProfile: activeProfile)) {
                             HStack(spacing: 10) {
                                 Image(systemName: "cross.case.fill")
                                     .font(.system(size: 16))
@@ -280,7 +280,7 @@ struct HomeView: View {
                             .padding(.leading, 62)
                             .padding(.trailing, 16)
                         
-                        NavigationLink(destination: DocumentsView()) {
+                        NavigationLink(destination: DocumentsView(activeProfile: activeProfile)) {
                             HStack(spacing: 10) {
                                 Image(systemName: "doc.text.fill")
                                     .font(.system(size: 16))
@@ -500,7 +500,28 @@ struct ProfileManagementSheet: View {
     }
 }
 
+// MARK: - Acting For Banner Component
+struct ActingForBanner: View {
+    let profile: ProfileOption
+    
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "person.fill")
+                .font(.system(size: 12))
+            Text("Acting for: \(profile.name)")
+                .font(.subheadline)
+                .bold()
+        }
+        .foregroundColor(Color.nhsWhite)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background(profile.backgroundColor)
+        .clipShape(Capsule())
+    }
+}
+
 #Preview {
     HomeView()
         .environmentObject(MessageStore())
 }
+

@@ -102,6 +102,6 @@ struct ScrollOffsetPreferenceKey: PreferenceKey {
 }
 
 #Preview {
-    PrescriptionsView()
+    PrescriptionsView(activeProfile: .self_)
 }
 

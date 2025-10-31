@@ -121,6 +121,6 @@ struct AppointmentTypeSelectionView: View {
 
 #Preview {
     NavigationView {
-        AppointmentsView()
+        AppointmentsView(activeProfile: .self_)
     }
 }

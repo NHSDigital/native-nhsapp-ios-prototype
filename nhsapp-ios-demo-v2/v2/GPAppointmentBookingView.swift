@@ -965,6 +965,6 @@ extension EnvironmentValues {
 // MARK: - Preview
 #Preview {
     NavigationStack {
-        AppointmentsView()
+        AppointmentsView(activeProfile: .self_)
     }
 }

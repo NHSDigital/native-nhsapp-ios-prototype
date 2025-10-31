@@ -1,9 +1,19 @@
 import SwiftUI
 
 struct DocumentsView: View {
+    let activeProfile: ProfileOption
 
     var body: some View {
         List {
+
+            // Acting for banner
+            if activeProfile != .self_ {
+                Section {
+                    ActingForBanner(profile: activeProfile)
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                }
+            }
 
             Section {
                 RowLink(title: "GP documents") { DetailView(index: 0) }
@@ -28,5 +38,5 @@ struct DocumentsView: View {
 }
 
 #Preview {
-    DocumentsView()
+    DocumentsView(activeProfile: .self_)
 }

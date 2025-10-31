@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct AppointmentsView: View {
+    let activeProfile: ProfileOption
+    
     @State private var showAppointmentsSheet = false
     @State private var showBookingFlow = false
     
@@ -8,6 +10,16 @@ struct AppointmentsView: View {
 
     var body: some View {
         List {
+            
+            // Acting for banner
+            if activeProfile != .self_ {
+                Section {
+                    ActingForBanner(profile: activeProfile)
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                }
+            }
+            
             Section {
                 // Book an appointment - navigates to embedded flow
                 Button(action: {
@@ -83,6 +95,6 @@ struct AppointmentsView: View {
 
 #Preview {
     NavigationStack {
-        AppointmentsView()
+        AppointmentsView(activeProfile: .self_)
     }
 }

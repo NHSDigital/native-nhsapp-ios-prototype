@@ -1,10 +1,22 @@
 import SwiftUI
 
 struct VaccinationsView: View {
+    let activeProfile: ProfileOption
+    
     @State private var showBookingFlow = false
     
     var body: some View {
         List {
+            
+            // Acting for banner
+            if activeProfile != .self_ {
+                Section {
+                    ActingForBanner(profile: activeProfile)
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                }
+            }
+            
             Section {
                 // Custom row that looks like RowLink but opens a sheet
                 HStack {
@@ -939,7 +951,7 @@ struct BookingStep7View: View {
 
 // MARK: - Preview
 #Preview() {
-    VaccinationsView()
+    VaccinationsView(activeProfile: .self_)
 }
 
 

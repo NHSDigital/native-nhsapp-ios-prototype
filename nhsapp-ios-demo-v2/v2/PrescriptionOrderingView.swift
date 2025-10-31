@@ -1087,7 +1087,7 @@ struct PrescriptionOrderStep6View: View {
 
 // MARK: - Preview
 #Preview {
-    PrescriptionsView()
+    PrescriptionsView(activeProfile: .self_)
 }
 
 //#Preview("Confirmation Step") {

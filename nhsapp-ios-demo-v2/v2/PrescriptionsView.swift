@@ -1,12 +1,22 @@
 import SwiftUI
 
 struct PrescriptionsView: View {
+    let activeProfile: ProfileOption
     
     @State private var showPrescriptionCard = true
     @State private var showPrescriptionOrderFlow = false
 
     var body: some View {
         List {
+            
+            // Acting for banner
+            if activeProfile != .self_ {
+                Section {
+                    ActingForBanner(profile: activeProfile)
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                }
+            }
             
             // Prescription card - dismissable
             if showPrescriptionCard {
@@ -103,6 +113,6 @@ struct PrescriptionsView: View {
 
 #Preview {
     NavigationStack {
-        PrescriptionsView()
+        PrescriptionsView(activeProfile: .self_)
     }
 }
