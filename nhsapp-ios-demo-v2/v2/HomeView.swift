@@ -7,55 +7,6 @@ struct HomeView: View {
         let title: String
         let url: URL
     }
-    
-    // Profile options
-    enum ProfileOption: String, CaseIterable, Identifiable {
-        case self_ = "Yourself"
-        case spouse = "Spouse"
-        case child = "Child"
-        
-        var id: String { self.rawValue }
-        
-        var name: String {
-            switch self {
-            case .self_: return "Shivaya Patel-Jones"
-            case .spouse: return "Alex Patel-Jones"
-            case .child: return "Maya Patel-Jones"
-            }
-        }
-        
-        var nhsNumber: String {
-            switch self {
-            case .self_: return "123 567 890"
-            case .spouse: return "234 678 901"
-            case .child: return "345 789 012"
-            }
-        }
-        
-        var age: String {
-            switch self {
-            case .self_: return "46 years old (you)"
-            case .spouse: return "44 years old (your spouse)"
-            case .child: return "12 years old (your child)"
-            }
-        }
-        
-        var backgroundColor: Color {
-            switch self {
-            case .self_: return Color("NHSBlue")
-            case .spouse: return Color("NHSPurple")
-            case .child: return Color("NHSGreen")
-            }
-        }
-        
-        var messageCount: Int {
-            switch self {
-            case .self_: return 3
-            case .spouse: return 1
-            case .child: return 5
-            }
-        }
-    }
 
     @State private var selectedLink: LinkItem? = nil
     @AccessibilityFocusState private var isSafariFocused: Bool
@@ -143,7 +94,7 @@ struct HomeView: View {
                             }
                             .padding(.top, 10)
                             
-                            NavigationLink(destination: ProfileView()) {
+                            NavigationLink(destination: ProfileView(profile: activeProfile)) {
                                 HStack(spacing: 6) {
                                     Image(systemName: "person.crop.circle")
                                         .font(.system(size: 16))
@@ -448,7 +399,7 @@ struct HomeView: View {
 
 struct ProfileManagementSheet: View {
     @Binding var isPresented: Bool
-    @Binding var selectedProfile: HomeView.ProfileOption
+    @Binding var selectedProfile: ProfileOption
     var onConfirm: () -> Void
     
     var body: some View {
@@ -472,7 +423,7 @@ struct ProfileManagementSheet: View {
                     
                     // Radio list items
                     List {
-                        ForEach(HomeView.ProfileOption.allCases) { option in
+                        ForEach(ProfileOption.allCases) { option in
                             Button(action: {
                                 selectedProfile = option
                             }) {

@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct ProfileView: View {
+    let profile: ProfileOption
+    
     var body: some View {
         NavigationStack {
             List {
@@ -9,12 +11,12 @@ struct ProfileView: View {
                 Section {
                     HStack(alignment: .center) {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("David Hunter")
+                            Text(profile.name)
                                 .font(.title2)
                                 .bold()
                             Text("Date of birth: 15 March 1984")
                                 .font(.subheadline)
-                            Text("NHS number: 123 456 789")
+                            Text("NHS number: \(profile.nhsNumber)")
                                 .font(.subheadline)
                         }
                     }
@@ -74,5 +76,5 @@ struct ProfileView: View {
 
 
 #Preview {
-    ProfileView()
+    ProfileView(profile: .self_)
 }
