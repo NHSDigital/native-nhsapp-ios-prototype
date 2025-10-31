@@ -391,7 +391,7 @@ struct HomeView: View {
                         }
                         .background(.clear)
                         .overlay(RoundedRectangle(cornerRadius: 30).stroke(Color.nhsGrey3, lineWidth: 1))
-                        .cornerRadius(28)
+                        .cornerRadius(30)
                         .padding(.horizontal, 16)
                     }
                     
@@ -408,10 +408,13 @@ struct HomeView: View {
                         ) {
                             DetailView(index: 0)
                         }
+                        .padding(.top, 20)
+
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
                     .padding(.bottom, 32)
+
                 }
             }
             .ignoresSafeArea(edges: .top)

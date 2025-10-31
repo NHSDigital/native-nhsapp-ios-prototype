@@ -26,18 +26,18 @@ struct CampaignCard<Destination: View>: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            // --- Image ---
-            Image(imageName)
-                .resizable()
-                .scaledToFill()
-                .frame(height: 180)
-                .clipped()
+        NavigationLink {
+            destination
+        } label: {
+            VStack(spacing: 0) {
+                // --- Image ---
+                Image(imageName)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(height: 180)
+                    .clipped()
 
-            // --- Content (tap to navigate) ---
-            NavigationLink {
-                destination
-            } label: {
+                // --- Content ---
                 HStack(alignment: .center, spacing: 12) {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(title)
@@ -55,17 +55,14 @@ struct CampaignCard<Destination: View>: View {
                         .foregroundColor(chevronColor)
                         .font(.headline)
                         .imageScale(.medium)
-                        .padding(.trailing, -4) // 👈 precise right spacing
                 }
-                .padding(.leading, 16)  // left side only
-                .padding(.vertical, 16)
-                .contentShape(Rectangle())
+                .padding(16)
+                .background(backgroundColor)
             }
-            .buttonStyle(.plain)
-            .background(backgroundColor)
+            .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .shadow(radius: 2)
+        .buttonStyle(.plain)
     }
 }
 
