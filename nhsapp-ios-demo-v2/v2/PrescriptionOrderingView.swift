@@ -116,8 +116,7 @@ struct PrescriptionOrderStep1ContentView: View {
                     print("DEBUG: X button tapped, setting isPresented to false")
                     isPresented = false
                 }) {
-                    Image(systemName: "xmark")
-                        .accessibilityLabel("Close")
+                    Text("Close")
                 }
             }
         }
@@ -216,18 +215,17 @@ struct PrescriptionOrderStep2View: View {
                 Button(action: {
                     showCloseAlert = true
                 }) {
-                    Image(systemName: "xmark")
-                        .accessibilityLabel("Close")
+                    Text("Close")
                 }
             }
         }
-        .alert("Are you sure you want to close this form?", isPresented: $showCloseAlert) {
-            Button("Continue with form", role: .cancel) { }
-            Button("Exit form", role: .destructive) {
+        .alert("Are you sure you want to exit this service?", isPresented: $showCloseAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Exit", role: .destructive) {
                 isPresented = false
             }
         } message: {
-            Text("Your progress will not be saved.")
+            Text("Your progress will not be saved if you exit this service. Press cancel to keep working.")
         }
         .sheet(isPresented: $showChangePharmacy) {
             ChangePharmacySheet(flowData: flowData, isPresented: $showChangePharmacy)
@@ -328,8 +326,7 @@ struct ChangePharmacySheet: View {
                     Button(action: {
                         isPresented = false
                     }) {
-                        Image(systemName: "xmark")
-                            .accessibilityLabel("Close")
+                        Text("Close")
                     }
                 }
             }
@@ -487,8 +484,7 @@ struct PrescriptionOrderStep3View: View {
                 Button(action: {
                     showCloseAlert = true
                 }) {
-                    Image(systemName: "xmark")
-                        .accessibilityLabel("Close")
+                    Text("Close")
                 }
             }
         }
@@ -565,8 +561,7 @@ struct PrescriptionOrderStep4View: View {
                 Button(action: {
                     showCloseAlert = true
                 }) {
-                    Image(systemName: "xmark")
-                        .accessibilityLabel("Close")
+                    Text("Close")
                 }
             }
         }
@@ -713,8 +708,7 @@ struct PrescriptionOrderStep5View: View {
                 Button(action: {
                     showCloseAlert = true
                 }) {
-                    Image(systemName: "xmark")
-                        .accessibilityLabel("Close")
+                    Text("Close")
                 }
             }
         }
@@ -883,8 +877,7 @@ struct EditMedicinesSheet: View {
                     Button(action: {
                         isPresented = false
                     }) {
-                        Image(systemName: "xmark")
-                            .accessibilityLabel("Close")
+                        Text("Close")
                     }
                 }
             }
@@ -952,8 +945,7 @@ struct EditInformationSheet: View {
                     Button(action: {
                         isPresented = false
                     }) {
-                        Image(systemName: "xmark")
-                            .accessibilityLabel("Close")
+                        Text("Close")
                     }
                 }
             }
